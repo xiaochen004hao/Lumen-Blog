@@ -1,0 +1,56 @@
+---
+interface Props {
+  type?: 'note' | 'tip' | 'warning' | 'quote';
+  title?: string;
+}
+const { type = 'note', title } = Astro.props;
+const labels = { note: '笔记', tip: '提示', warning: '注意', quote: '引述' };
+---
+
+<aside class:list={['callout', type]}>
+  <div class="callout-head">
+    <span class="callout-icon" aria-hidden="true">{type === 'warning' ? '!' : type === 'tip' ? '✦' : type === 'quote' ? '❝' : 'i'}</span>
+    <strong>{title ?? labels[type]}</strong>
+  </div>
+  <div class="callout-body"><slot /></div>
+</aside>
+
+<style>
+  .callout {
+    --callout-color: var(--indigo);
+    margin-block: 2rem;
+    padding: 1.2rem 1.5rem;
+    border: 1px solid color-mix(in srgb, var(--callout-color) 24%, transparent);
+    border-radius: var(--radius-md);
+    background: color-mix(in srgb, var(--callout-color) 7%, var(--surface));
+  }
+  .callout.tip { --callout-color: var(--mint); }
+  .callout.warning { --callout-color: var(--ember); }
+  .callout.quote { --callout-color: var(--rose); }
+  .callout-head {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 0.5rem;
+    color: var(--callout-color);
+    font-family: var(--font-sans);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+  }
+  .callout-icon {
+    display: grid;
+    place-items: center;
+    width: 1.35rem;
+    height: 1.35rem;
+    border-radius: 50%;
+    background: var(--callout-color);
+    color: var(--paper);
+    font-size: 0.8rem;
+  }
+  .callout-body :global(p) {
+    margin: 0;
+    font-size: 0.95rem;
+    line-height: 1.85;
+  }
+</style>

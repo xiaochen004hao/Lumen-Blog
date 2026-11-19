@@ -1,0 +1,58 @@
+---
+/**
+ * 全局背景：细线方格 + 鼠标邻近辉光。
+ * 鼠标附近的方格微微发亮（越近越亮），并叠加一层极淡的强调色氛围光。
+ * 位于 z-index: -1，永远在内容之下，不影响阅读；触屏与「减少动态」自动关闭辉光。
+ */
+---
+
+<div class="grid-glow" aria-hidden="true"></div>
+
+<style>
+  .grid-glow {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background-image: linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
+    background-size: 56px 56px;
+  }
+  /* 鼠标周围的方格变亮：用同尺寸但强调色更高的网格，靠 mask 圈出亮区 */
+  .grid-glow::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: linear-gradient(to right, color-mix(in srgb, var(--ember) 38%, transparent) 1px, transparent 1px),
+      linear-gradient(to bottom, color-mix(in srgb, var(--ember) 38%, transparent) 1px, transparent 1px);
+    background-size: 56px 56px;
+    mask-image: radial-gradient(
+      300px circle at var(--glow-x, -999px) var(--glow-y, -999px),
+      rgba(0, 0, 0, 0.9),
+      transparent 78%
+    );
+    -webkit-mask-image: radial-gradient(
+      300px circle at var(--glow-x, -999px) var(--glow-y, -999px),
+      rgba(0, 0, 0, 0.9),
+      transparent 78%
+    );
+    opacity: 0.55;
+  }
+  /* 极淡的氛围光晕，柔化网格的机械感 */
+  .grid-glow::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+      460px circle at var(--glow-x, -999px) var(--glow-y, -999px),
+      color-mix(in srgb, var(--ember) 6%, transparent),
+      transparent 72%
+    );
+  }
+  @media (prefers-reduced-motion: reduce), (hover: none) {
+    .grid-glow::before,
+    .grid-glow::after {
+      display: none;
+    }
+  }
+</style>

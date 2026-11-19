@@ -1,0 +1,113 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Icon from '../components/Icon.astro';
+import Aurora from '../components/Aurora.astro';
+---
+
+<BaseLayout title="页面走丢了" description="这个页面似乎飘进了留白里。">
+  <section class="not-found">
+    <Aurora />
+    <div class="container nf-inner">
+      <div class="nf-number" aria-hidden="true">
+        <span>4</span>
+        <span class="nf-zero"><i></i><i></i><i></i></span>
+        <span>4</span>
+      </div>
+      <span class="eyebrow">LOST IN THE WHITESPACE</span>
+      <h1 transition:name="page-heading">这页内容，好像飘走了。</h1>
+      <p>它可能被移动、重命名，或者从未存在过。不过别担心，花园还在，故事也还在。</p>
+      <div class="nf-actions">
+        <a class="btn btn-primary" href="/"><Icon name="arrow-left" size={16} /> 回到首页</a>
+        <a class="btn btn-outline" href="/writing">去读文章 <Icon name="arrow-right" size={15} /></a>
+      </div>
+      <button class="search-inline" type="button" data-search-open><Icon name="search" size={14} /> 或者搜索一下</button>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .not-found {
+    position: relative;
+    display: grid;
+    place-items: center;
+    min-height: calc(100vh - var(--header-h) - 220px);
+    overflow: hidden;
+    padding-block: 5rem;
+    text-align: center;
+  }
+  .nf-inner {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .nf-number {
+    display: flex;
+    align-items: center;
+    gap: 0.1em;
+    font-family: var(--font-serif);
+    font-size: clamp(7rem, 22vw, 17rem);
+    font-weight: 600;
+    line-height: 0.9;
+    letter-spacing: -0.08em;
+    background: linear-gradient(135deg, var(--ink), var(--ember));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .nf-zero {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 0.72em;
+    height: 0.72em;
+    margin-inline: 0.04em;
+    border: 0.055em solid var(--ember);
+    border-radius: 50%;
+    animation: spin-slow 16s linear infinite;
+  }
+  .nf-zero i {
+    position: absolute;
+    width: 0.07em;
+    height: 0.07em;
+    border-radius: 50%;
+    background: var(--ember);
+  }
+  .nf-zero i:nth-child(1) { top: -0.04em; left: 46%; }
+  .nf-zero i:nth-child(2) { bottom: 12%; right: 6%; }
+  .nf-zero i:nth-child(3) { bottom: 12%; left: 6%; }
+  .eyebrow { margin-top: 1.5rem; }
+  h1 {
+    margin-top: 1.2rem;
+    font-family: var(--font-serif);
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    letter-spacing: -0.03em;
+  }
+  p {
+    max-width: 32rem;
+    margin-top: 1rem;
+    color: var(--muted);
+    font-size: 0.95rem;
+    line-height: 1.9;
+  }
+  .nf-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.8rem;
+    margin-top: 2.2rem;
+  }
+  .search-inline {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    margin-top: 1.4rem;
+    padding: 0.4rem 0.8rem;
+    border: 0;
+    background: transparent;
+    color: var(--muted);
+    font-size: 0.8rem;
+  }
+  .search-inline:hover { color: var(--ember); }
+</style>

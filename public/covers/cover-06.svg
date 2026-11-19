@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" role="img" aria-label="Abstract ember and indigo arcs">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f4e8e2"/><stop offset=".5" stop-color="#e6dcee"/><stop offset="1" stop-color="#d8d5f2"/></linearGradient>
+    <radialGradient id="warm"><stop stop-color="#0f766e" stop-opacity=".42"/><stop offset="1" stop-color="#0f766e" stop-opacity="0"/></radialGradient>
+    <radialGradient id="cool"><stop stop-color="#2b6d9e" stop-opacity=".38"/><stop offset="1" stop-color="#2b6d9e" stop-opacity="0"/></radialGradient>
+    <filter id="grain"><feTurbulence type="fractalNoise" baseFrequency=".8" numOctaves="3" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter>
+  </defs>
+  <rect width="1200" height="675" fill="url(#bg)"/>
+  <circle cx="180" cy="180" r="340" fill="url(#warm)"/>
+  <circle cx="1020" cy="520" r="360" fill="url(#cool)"/>
+  <g fill="none" stroke-width="2">
+    <circle cx="600" cy="338" r="120" stroke="#0f766e" stroke-opacity=".4" stroke-dasharray="6 10"/>
+    <circle cx="600" cy="338" r="200" stroke="#2b6d9e" stroke-opacity=".3" stroke-dasharray="2 12"/>
+    <circle cx="600" cy="338" r="280" stroke="#1a1a18" stroke-opacity=".1"/>
+  </g>
+  <path d="M440 338h320" stroke="#1a1a18" stroke-opacity=".3" stroke-width="1"/>
+  <path d="M600 178v320" stroke="#1a1a18" stroke-opacity=".3" stroke-width="1"/>
+  <circle cx="600" cy="338" r="20" fill="#faf8f4"/>
+  <circle cx="600" cy="338" r="7" fill="#0f766e"/>
+  <rect width="1200" height="675" filter="url(#grain)" opacity=".07" style="mix-blend-mode:multiply"/>
+</svg>

@@ -1,0 +1,155 @@
+---
+import Icon from './Icon.astro';
+import { siteConfig } from '../data/site.config';
+const c = siteConfig.newsletter;
+---
+
+<section class="subscribe-wrap" data-reveal="scale">
+  <div class="subscribe">
+    <div class="subscribe-art" aria-hidden="true">
+      <span class="ring ring-a"></span>
+      <span class="ring ring-b"></span>
+      <Icon name="mail" size={34} />
+    </div>
+    <div class="subscribe-body">
+      <span class="eyebrow">NEWSLETTER</span>
+      <h2>{c.title}</h2>
+      <p>{c.description}</p>
+      <form data-newsletter action={c.action} method="post">
+        <div class="form-row">
+          <input type="email" name="email" required placeholder={c.placeholder} aria-label="邮箱地址" />
+          <button class="btn btn-primary" type="submit">{c.buttonLabel}<Icon name="arrow-right" size={16} /></button>
+        </div>
+        <span class="form-note" data-form-note>{c.note}</span>
+      </form>
+    </div>
+  </div>
+</section>
+
+<style>
+  .subscribe-wrap {
+    padding-inline: clamp(0rem, 3vw, 2rem);
+  }
+  .subscribe {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(180px, 0.8fr) 1.4fr;
+    align-items: center;
+    gap: clamp(1.5rem, 5vw, 4rem);
+    overflow: hidden;
+    padding: clamp(2.2rem, 5vw, 4rem);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-xl);
+    background:
+      radial-gradient(circle at 12% 20%, var(--ember-soft), transparent 45%),
+      radial-gradient(circle at 92% 90%, var(--indigo-soft), transparent 50%),
+      var(--surface);
+    box-shadow: var(--shadow-md);
+  }
+  .subscribe::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
+    background-size: 34px 34px;
+    mask-image: radial-gradient(circle at 80% 50%, #000, transparent 75%);
+    pointer-events: none;
+  }
+  .subscribe-art {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: clamp(120px, 14vw, 180px);
+    aspect-ratio: 1;
+    justify-self: center;
+    color: var(--ember);
+  }
+  .ring {
+    position: absolute;
+    border: 1px solid var(--ember);
+    border-radius: 50%;
+    opacity: 0.3;
+  }
+  .ring-a {
+    inset: 0;
+    animation: drift 9s ease-in-out infinite;
+  }
+  .ring-b {
+    inset: 16%;
+    opacity: 0.5;
+    animation: float-slow 11s ease-in-out infinite reverse;
+  }
+  .subscribe-art :global(svg) {
+    position: relative;
+    z-index: 1;
+  }
+  .subscribe-body {
+    position: relative;
+    z-index: 1;
+  }
+  .subscribe h2 {
+    margin-top: 0.7rem;
+    font-family: var(--font-serif);
+    font-size: clamp(1.6rem, 3.4vw, 2.4rem);
+    letter-spacing: -0.03em;
+  }
+  .subscribe p {
+    max-width: 34rem;
+    margin-top: 0.8rem;
+    color: var(--muted);
+    font-size: 0.92rem;
+  }
+  .form-row {
+    display: flex;
+    gap: 0.6rem;
+    max-width: 30rem;
+    margin-top: 1.7rem;
+    padding: 0.35rem;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-full);
+    background: var(--surface);
+    transition: border-color var(--t-fast), box-shadow var(--t-fast);
+  }
+  .form-row:focus-within {
+    border-color: var(--ember);
+    box-shadow: 0 0 0 4px var(--ember-soft);
+  }
+  .form-row input {
+    flex: 1;
+    min-width: 0;
+    padding: 0 0.9rem;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    font-size: 0.9rem;
+  }
+  .form-row input::placeholder {
+    color: var(--faint);
+  }
+  .form-row .btn {
+    min-height: 2.6rem;
+    padding: 0.5rem 1.2rem;
+  }
+  .form-note {
+    display: block;
+    margin-top: 0.8rem;
+    font-size: 0.75rem;
+    color: var(--faint);
+  }
+  .form-note.is-success {
+    color: var(--mint);
+    font-weight: 600;
+  }
+
+  @media (max-width: 680px) {
+    .subscribe {
+      grid-template-columns: 1fr;
+      text-align: center;
+      justify-items: center;
+    }
+    .form-row {
+      width: 100%;
+    }
+  }
+</style>

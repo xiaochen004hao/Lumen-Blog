@@ -1,0 +1,271 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Icon from '../../components/Icon.astro';
+import Reveal from '../../components/Reveal.astro';
+import Aurora from '../../components/Aurora.astro';
+import { tagUrl } from '../../utils/format';
+
+const posts = await getCollection('blog', ({ data }) => !data.draft);
+const notes = await getCollection('notes', ({ data }) => !data.draft);
+
+const counts = new Map<string, number>();
+[...posts.flatMap((p) => p.data.tags), ...notes.flatMap((n) => n.data.tags)].forEach((tag) =>
+  counts.set(tag, (counts.get(tag) ?? 0) + 1)
+);
+const tags = Array.from(counts.entries()).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 'zh-CN'));
+const max = Math.max(...tags.map(([, count]) => count), 1);
+const sizeFor = (count: number) => (count / max > 0.7 ? 'xl' : count / max > 0.45 ? 'lg' : count / max > 0.25 ? 'md' : 'sm');
+---
+
+<BaseLayout title="标签" description="按主题浏览这座数字花园的所有内容。">
+  <section class="page-hero">
+    <Aurora />
+    <div class="container page-hero-inner">
+      <div class="page-eyebrow"><span></span>BROWSE BY TOPIC</div>
+      <h1 transition:name="page-heading">主题<em>地图</em></h1>
+      <p>把内容按照主题重新排列，也许你会发现一些原本没注意到的联系。</p>
+      <div class="hero-count"><Icon name="hash" size={14} /> {tags.length} 个主题 · {posts.length + notes.length} 篇内容</div>
+    </div>
+  </section>
+
+  <section class="section-tight index-section">
+    <div class="container">
+      <Reveal>
+        <div class="index-panel">
+          <div class="panel-head">
+            <span class="eyebrow">TOPIC INDEX</span>
+            <span class="panel-meta">按内容数量排序 · 共 {tags.length} 项</span>
+          </div>
+          <div class="cloud">
+            {tags.map(([tag, count], i) => (
+              <a class:list={['cloud-tag', sizeFor(count)]} href={tagUrl(tag)} style={`--i:${i}`}>
+                <span class="hash">#</span><span class="name">{tag}</span><sup>{String(count).padStart(2, '0')}</sup>
+              </a>
+            ))}
+          </div>
+        </div>
+      </Reveal>
+    </div>
+  </section>
+
+  <section class="section-tight archive-section">
+    <div class="container">
+      <Reveal>
+        <div class="section-head">
+          <div>
+            <span class="eyebrow">ALL TOPICS</span>
+            <h2 class="section-title">完整<em>列表</em></h2>
+          </div>
+          <p class="section-desc">每一行都是一个入口。点击即可查看该主题下的全部文章与笔记。</p>
+        </div>
+      </Reveal>
+      <div class="tag-list">
+        {tags.map(([tag, count], i) => (
+          <div class="tag-row" data-reveal style={`--reveal-delay:${(i % 6) * 40}ms`}>
+            <a href={tagUrl(tag)}>
+              <span class="tag-index">{String(i + 1).padStart(2, '0')}</span>
+              <span class="tag-name">#{tag}</span>
+              <span class="tag-bar"><i style={`width:${(count / max) * 100}%`}></i></span>
+              <span class="tag-count">{count} 篇</span>
+              <Icon name="arrow-up-right" size={15} />
+            </a>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .page-hero {
+    position: relative;
+    overflow: hidden;
+    padding-block: clamp(4rem, 9vw, 7rem) clamp(3rem, 6vw, 4.5rem);
+    border-bottom: 1px solid var(--line);
+  }
+  .page-hero-inner {
+    position: relative;
+    z-index: 1;
+  }
+  .page-eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    color: var(--ember);
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.22em;
+  }
+  .page-eyebrow span {
+    width: 1.6rem;
+    height: 1px;
+    background: currentColor;
+  }
+  h1 {
+    margin-top: 1.2rem;
+    font-family: var(--font-serif);
+    font-size: clamp(2.8rem, 7vw, 5.2rem);
+    font-weight: 600;
+    letter-spacing: -0.05em;
+  }
+  h1 em {
+    font-style: normal;
+    color: var(--ember);
+  }
+  .page-hero p {
+    max-width: 36rem;
+    margin-top: 1.3rem;
+    color: var(--ink-soft);
+    line-height: 1.9;
+  }
+  .hero-count {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    margin-top: 1.8rem;
+    color: var(--muted);
+    font-size: 0.76rem;
+    font-family: var(--font-mono);
+  }
+
+  .index-section {
+    padding-bottom: 0;
+  }
+  .index-panel {
+    padding: clamp(1.8rem, 4vw, 3rem);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+  }
+  .panel-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--line);
+  }
+  .panel-meta {
+    color: var(--muted);
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+  }
+  .cloud {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 1.1rem 2.1rem;
+    padding-top: 2.2rem;
+  }
+  .cloud-tag {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.25rem;
+    color: var(--ink-soft);
+    line-height: 1.15;
+    opacity: 0;
+    animation: rise-in 600ms var(--ease-out) forwards;
+    animation-delay: calc(var(--i) * 30ms);
+    transition: color var(--t-fast);
+  }
+  .cloud-tag:hover {
+    color: var(--ember);
+  }
+  .cloud-tag .hash {
+    color: var(--ember);
+    font-family: var(--font-mono);
+    font-weight: 500;
+    font-size: 0.65em;
+  }
+  .cloud-tag sup {
+    margin-left: 0.15rem;
+    font-family: var(--font-mono);
+    font-size: 0.5em;
+    color: var(--muted);
+  }
+  .cloud-tag.xl .name { font-family: var(--font-serif); font-size: clamp(2rem, 4vw, 2.8rem); font-weight: 600; }
+  .cloud-tag.lg .name { font-family: var(--font-serif); font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 600; }
+  .cloud-tag.md .name { font-size: clamp(1.1rem, 2vw, 1.35rem); font-weight: 600; }
+  .cloud-tag.sm .name { font-size: 0.98rem; font-weight: 550; }
+
+  .archive-section {
+    padding-top: 2rem;
+  }
+  .archive-section .section-head {
+    align-items: flex-end;
+  }
+  .tag-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0 3rem;
+  }
+  .tag-row a {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.05rem 0.2rem;
+    border-bottom: 1px solid var(--line);
+    color: var(--muted);
+    transition: color var(--t-fast), padding var(--t-fast), background-color var(--t-fast);
+  }
+  .tag-row a:hover {
+    color: var(--ink);
+    padding-inline: 0.6rem;
+    background: var(--ember-soft);
+  }
+  .tag-index {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--muted);
+  }
+  .tag-name {
+    flex: none;
+    min-width: 8rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .tag-bar {
+    flex: 1;
+    height: 3px;
+    border-radius: 3px;
+    background: var(--paper-deep);
+    overflow: hidden;
+  }
+  .tag-bar i {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: var(--ember);
+    opacity: 0.75;
+  }
+  .tag-count {
+    flex: none;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--muted);
+  }
+  .tag-row a :global(svg) {
+    color: var(--faint);
+  }
+  .tag-row a:hover :global(svg) {
+    color: var(--ember);
+  }
+
+  @media (max-width: 760px) {
+    .tag-list {
+      grid-template-columns: 1fr;
+    }
+    .tag-name {
+      min-width: 6rem;
+    }
+    .tag-bar {
+      display: none;
+    }
+    .cloud {
+      gap: 0.9rem 1.4rem;
+    }
+  }
+</style>

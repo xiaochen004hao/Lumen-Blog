@@ -1,0 +1,137 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Icon from '../../components/Icon.astro';
+import PostCard from '../../components/PostCard.astro';
+import NoteCard from '../../components/NoteCard.astro';
+import Aurora from '../../components/Aurora.astro';
+import { siteConfig } from '../../data/site.config';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog', ({ data }) => !data.draft);
+  const notes = await getCollection('notes', ({ data }) => !data.draft);
+  const tags = new Set([...posts.flatMap((p) => p.data.tags), ...notes.flatMap((n) => n.data.tags)]);
+  return Array.from(tags).map((tag) => ({
+    params: { tag },
+    props: {
+      tag,
+      posts: posts
+        .filter((p) => p.data.tags.includes(tag))
+        .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()),
+      notes: notes
+        .filter((n) => n.data.tags.includes(tag))
+        .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()),
+    },
+  }));
+}
+
+const { tag, posts, notes } = Astro.props;
+---
+
+<BaseLayout title={`#${tag}`} description={`${siteConfig.title} 标签「${tag}」下的全部文章与笔记。`}>
+  <section class="page-hero">
+    <Aurora />
+    <div class="container page-hero-inner">
+      <a class="back-link" href="/tags"><Icon name="arrow-left" size={14} /> 所有标签</a>
+      <div class="page-eyebrow"><span></span>TOPIC ARCHIVE</div>
+      <h1 transition:name="page-heading"><span class="hash">#</span>{tag}</h1>
+      <p>这里收录了 {posts.length} 篇文章与 {notes.length} 条笔记，都和「{tag}」有关。</p>
+    </div>
+  </section>
+
+  <section class="section-tight">
+    <div class="container">
+      {posts.length > 0 && (
+        <>
+          <div class="block-head"><span class="eyebrow">ARTICLES</span><h2 class="section-title">相关<em>文章</em></h2></div>
+          <div class="post-grid">
+            {posts.map((post, i) => <PostCard post={post} index={i} />)}
+          </div>
+        </>
+      )}
+      {notes.length > 0 && (
+        <>
+          <div class="block-head spaced"><span class="eyebrow">FRAGMENTS</span><h2 class="section-title">相关<em>笔记</em></h2></div>
+          <div class="note-grid">
+            {notes.map((note, i) => <NoteCard note={note} index={i} />)}
+          </div>
+        </>
+      )}
+      <div class="other-tags">
+        <span>其他标签：</span>
+        <a href="/tags">查看全部 <Icon name="arrow-right" size={13} /></a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .page-hero {
+    position: relative;
+    overflow: hidden;
+    padding-block: clamp(4rem, 9vw, 7rem) clamp(3rem, 6vw, 4.5rem);
+    border-bottom: 1px solid var(--line);
+  }
+  .page-hero-inner { position: relative; z-index: 1; }
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: var(--muted);
+    font-size: 0.78rem;
+  }
+  .back-link:hover { color: var(--ember); }
+  .page-eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    margin-top: 2rem;
+    color: var(--ember);
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.22em;
+  }
+  .page-eyebrow span { width: 1.6rem; height: 1px; background: currentColor; }
+  h1 {
+    margin-top: 1rem;
+    font-family: var(--font-serif);
+    font-size: clamp(3rem, 8vw, 5.8rem);
+    font-weight: 600;
+    letter-spacing: -0.05em;
+  }
+  .hash { color: var(--ember); }
+  .page-hero p { margin-top: 1.2rem; color: var(--muted); line-height: 1.9; }
+
+  .block-head { margin-bottom: 2rem; }
+  .block-head.spaced { margin-top: 4rem; }
+  .post-grid,
+  .note-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.3rem;
+  }
+  .other-tags {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    margin-top: 4rem;
+    padding-top: 1.6rem;
+    border-top: 1px solid var(--line);
+    color: var(--muted);
+    font-size: 0.82rem;
+  }
+  .other-tags a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    color: var(--ink);
+    font-weight: 600;
+  }
+  .other-tags a:hover { color: var(--ember); }
+  @media (max-width: 900px) {
+    .post-grid, .note-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 620px) {
+    .post-grid, .note-grid { grid-template-columns: 1fr; }
+  }
+</style>

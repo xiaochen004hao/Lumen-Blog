@@ -1,0 +1,20 @@
+<div class="reading-progress" aria-hidden="true"><span data-progress-bar></span></div>
+
+<style>
+  .reading-progress {
+    position: fixed;
+    inset: 0 0 auto 0;
+    z-index: 1100;
+    height: 2px;
+    background: transparent;
+    pointer-events: none;
+  }
+  .reading-progress span {
+    display: block;
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--ember), var(--indigo));
+    box-shadow: 0 0 12px var(--ember);
+    transition: width 90ms linear;
+  }
+</style>

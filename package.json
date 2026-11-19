@@ -1,0 +1,24 @@
+{
+  "name": "lumen-blog",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "留白 · Lumen — an award-worthy static digital garden built with Astro",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@astrojs/mdx": "^8.1.6",
+    "@astrojs/rss": "^4.0.19",
+    "@astrojs/sitemap": "^3.7.6",
+    "@waline/client": "^3.16.2",
+    "astro": "^7.4.13"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.2"
+  }
+}

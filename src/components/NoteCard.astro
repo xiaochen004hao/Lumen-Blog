@@ -1,0 +1,142 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import Icon from './Icon.astro';
+import { formatDate, plainText, tagUrl } from '../utils/format';
+
+interface Props {
+  note: CollectionEntry<'notes'>;
+  index?: number;
+}
+const { note, index = 0 } = Astro.props;
+const { title, description, pubDate, tags, mood, accent } = note.data;
+const summary = description ?? plainText(note.body, 110);
+---
+
+<article class="note-card" data-reveal data-tilt data-tilt-max={4} data-spotlight data-accent={accent} style={`--reveal-delay:${index * 60}ms`}>
+  <div class="note-top">
+    <span class="mood"><Icon name="sparkles" size={13} />{mood}</span>
+    <time datetime={pubDate.toISOString().slice(0, 10)}>{formatDate(pubDate, 'short')}</time>
+  </div>
+  <h3><a href={`/notes/${note.id}`}>{title}</a></h3>
+  <p>{summary}</p>
+  <div class="note-bottom">
+    <div class="tags">
+      {tags.slice(0, 3).map((tag) => <a class="tag" href={tagUrl(tag)}>#{tag}</a>)}
+    </div>
+    <a class="note-link" href={`/notes/${note.id}`} aria-label={`阅读笔记：${title}`}>
+      <Icon name="arrow-up-right" size={15} />
+    </a>
+  </div>
+</article>
+
+<style>
+  .note-card {
+    --note-accent: var(--indigo);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    padding: 1.6rem 1.6rem 1.25rem;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    transition: transform var(--t-base) var(--ease-out), box-shadow var(--t-base), border-color var(--t-base);
+  }
+  .note-card[data-accent='ember'] { --note-accent: var(--ember); }
+  .note-card[data-accent='mint'] { --note-accent: var(--mint); }
+  .note-card[data-accent='rose'] { --note-accent: var(--rose); }
+  .note-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    /* Painted as the card's own background, so it is clipped by the rounded
+       corners instead of overhanging them with square ends. */
+    background: linear-gradient(90deg, var(--note-accent), transparent 75%) no-repeat top / 100% 2px;
+    opacity: 0;
+    transition: opacity var(--t-base);
+    pointer-events: none;
+  }
+  .note-card:hover {
+    translate: 0 -5px;
+    border-color: color-mix(in srgb, var(--note-accent) 35%, transparent);
+    box-shadow: var(--shadow-md);
+  }
+  .note-card:hover::before {
+    opacity: 1;
+  }
+  .note-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.8rem;
+    font-size: 0.7rem;
+    color: var(--muted);
+    font-family: var(--font-mono);
+  }
+  .mood {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.25rem 0.6rem;
+    border-radius: var(--radius-full);
+    background: color-mix(in srgb, var(--note-accent) 10%, transparent);
+    color: var(--note-accent);
+    font-family: var(--font-sans);
+    font-weight: 600;
+  }
+  h3 {
+    margin-top: 1.15rem;
+    font-family: var(--font-serif);
+    font-size: 1.18rem;
+    line-height: 1.5;
+    letter-spacing: -0.015em;
+  }
+  h3 a {
+    transition: color var(--t-fast);
+  }
+  h3 a:hover {
+    color: var(--note-accent);
+  }
+  p {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin-top: 0.7rem;
+    color: var(--muted);
+    font-size: 0.85rem;
+    line-height: 1.8;
+  }
+  .note-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.8rem;
+    margin-top: auto;
+    padding-top: 1.4rem;
+  }
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+  }
+  .tag {
+    font-size: 0.67rem;
+    padding: 0.2rem 0.5rem;
+  }
+  .note-link {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    color: var(--muted);
+    transition: all var(--t-base) var(--ease-spring);
+  }
+  .note-card:hover .note-link {
+    background: var(--note-accent);
+    color: #fff;
+    transform: rotate(45deg);
+  }
+</style>

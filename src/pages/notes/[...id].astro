@@ -1,0 +1,140 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Icon from '../../components/Icon.astro';
+import ShareBar from '../../components/ShareBar.astro';
+import Comments from '../../components/Comments.astro';
+import { mdxComponents } from '../../utils/mdx-components';
+import { formatDate, tagUrl } from '../../utils/format';
+import { siteConfig } from '../../data/site.config';
+
+export async function getStaticPaths() {
+  const notes = await getCollection('notes', ({ data }) => !data.draft);
+  return notes.map((note) => ({ params: { id: note.id }, props: { note } }));
+}
+
+const { note } = Astro.props;
+const { Content } = await render(note);
+const { title, pubDate, tags, mood, accent } = note.data;
+const canonical = new URL(`/notes/${note.id}`, siteConfig.url).href;
+---
+
+<BaseLayout
+  title={title}
+  description={note.data.description ?? `${title} — 来自 ${siteConfig.title} 的灵感碎片。`}
+  tags={tags}
+>
+  <article class="note-detail" data-accent={accent}>
+    <div class="container note-container">
+      <a class="back-link" href="/notes"><Icon name="arrow-left" size={14} /> 返回所有笔记</a>
+
+      <header class="note-header">
+        <div class="note-badges">
+          <span class="mood"><Icon name="sparkles" size={13} />{mood}</span>
+          <span><Icon name="calendar" size={13} />{formatDate(pubDate)}</span>
+        </div>
+        <h1 transition:name="page-heading">{title}</h1>
+        {note.data.description && <p class="note-subtitle">{note.data.description}</p>}
+      </header>
+
+      <div class="note-divider"><span>✳</span></div>
+
+      <div class="prose note-content">
+        <Content components={mdxComponents} />
+      </div>
+
+      <div class="note-tail">
+        <div class="tags-row">
+          {tags.map((tag) => <a class="tag" href={tagUrl(tag)}>#{tag}</a>)}
+        </div>
+        <ShareBar title={title} url={canonical} />
+      </div>
+
+      <Comments />
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  .note-detail {
+    --note-accent: var(--indigo);
+    padding-block: clamp(3rem, 7vw, 5.5rem);
+  }
+  .note-detail[data-accent='ember'] { --note-accent: var(--ember); }
+  .note-detail[data-accent='mint'] { --note-accent: var(--mint); }
+  .note-detail[data-accent='rose'] { --note-accent: var(--rose); }
+  .note-container {
+    max-width: 800px;
+  }
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    color: var(--muted);
+    font-size: 0.78rem;
+  }
+  .back-link:hover { color: var(--note-accent); }
+  .note-header {
+    margin-top: 2.5rem;
+  }
+  .note-badges {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    color: var(--muted);
+    font-size: 0.75rem;
+  }
+  .note-badges span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .mood {
+    padding: 0.3rem 0.75rem;
+    border-radius: var(--radius-full);
+    background: color-mix(in srgb, var(--note-accent) 10%, transparent);
+    color: var(--note-accent);
+    font-weight: 600;
+  }
+  h1 {
+    margin-top: 1.4rem;
+    font-family: var(--font-serif);
+    font-size: clamp(2.2rem, 6vw, 4rem);
+    font-weight: 600;
+    line-height: 1.25;
+    letter-spacing: -0.045em;
+  }
+  .note-subtitle {
+    max-width: 38rem;
+    margin-top: 1.2rem;
+    color: var(--muted);
+    font-size: 1.05rem;
+    line-height: 1.9;
+  }
+  .note-divider {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-block: 3rem;
+    color: var(--note-accent);
+  }
+  .note-divider::before,
+  .note-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--line);
+  }
+  .note-content { font-size: 1.05rem; }
+  .note-tail {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    margin-top: 3.5rem;
+    padding-top: 1.8rem;
+    border-top: 1px solid var(--line);
+  }
+  .tags-row { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+</style>

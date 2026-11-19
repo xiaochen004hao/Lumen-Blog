@@ -1,0 +1,71 @@
+---
+title: 我用 Astro 重建了这座数字花园
+description: 从静态生成器到内容集合，从零 JavaScript 到恰到好处的交互 —— 一次关于「够用就好」的技术实践。
+pubDate: 2026-09-30
+updatedDate: 2026-10-12
+cover: /covers/cover-02.svg
+coverAlt: 靛蓝色网格与浮动的界面卡片
+tags: [Astro, 前端, 性能]
+category: 技术
+accent: indigo
+---
+
+我曾经用过很复杂的博客系统：数据库、后台、CDN、缓存策略，一套下来比文章本身还重。直到有一天我发现，我只是想安静地写点东西。
+
+于是我把它拆掉，用 Astro 重建了一遍。
+
+<Callout type="tip" title="这篇文章适合谁">
+如果你也想要一个加载快、好维护、又不失细节的博客，这篇记录或许能省下你一些探索的时间。
+</Callout>
+
+## 为什么是 Astro
+
+核心理由只有一个：**默认零 JavaScript**。
+
+大多数交互其实不需要前端框架。主题切换、搜索、目录高亮——这些用几十行原生 JavaScript 就能完成，而且更快、更稳、更容易调试。
+
+```astro
+---
+// 一个完整的页面组件，构建时生成 HTML
+import { getCollection } from 'astro:content';
+const posts = await getCollection('blog');
+---
+
+<ul>
+  {posts.map((post) => <li>{post.data.title}</li>)}
+</ul>
+```
+
+构建产物是纯 HTML。没有 hydration，没有 hydration 失败，也没有几十万字节的运行时。
+
+## 内容集合让写作变简单
+
+我把所有元数据收进一个配置文件，写作时只需要关心标题、日期和正文。
+
+<Callout type="note" title="内容集合的好处">
+- 类型安全：写错字段名，构建时就会报错
+- 统一默认值：不必每篇文章都重复填写
+- Markdown 与 MDX 共存：需要自定义组件时才用 MDX
+</Callout>
+
+新增一篇文章，就是在 `src/content/blog/` 下放一个 Markdown 文件。没有后台，没有数据库迁移，没有部署流程变更。
+
+## 交互要「恰到好处」
+
+我给自己定了一条规矩：每个动画都要能回答「它在告诉用户什么」。
+
+- 页面切换时的淡入，是在说「新内容来了」
+- 按钮悬浮时的位移，是在说「这里可以点」
+- 阅读进度条，是在说「你走了多远」
+
+<Callout type="warning" title="别忘了减少动态效果">
+一定要监听 `prefers-reduced-motion`。对一部分用户来说，华丽的动画意味着不适。这不是可选项。
+</Callout>
+
+## 结果
+
+构建后的首页只有一个很小的 HTML 文件，几张 SVG 封面，以及一段不到 10KB 的脚本。Lighthouse 的各项分数都很漂亮，但更重要的是：它打开得很快，读起来很安静。
+
+<Figure src="/covers/cover-02.svg" alt="数字花园的视觉隐喻" caption="好的工具应该像玻璃一样透明 —— 你看到的是内容，不是工具本身。" />
+
+技术选型到最后都是价值观的选择。我选择简单，是因为想把注意力留给写作本身。

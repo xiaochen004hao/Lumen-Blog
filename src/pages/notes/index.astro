@@ -1,0 +1,135 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Icon from '../../components/Icon.astro';
+import NoteCard from '../../components/NoteCard.astro';
+import Aurora from '../../components/Aurora.astro';
+import { siteConfig } from '../../data/site.config';
+
+const notes = (await getCollection('notes', ({ data }) => !data.draft)).sort(
+  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+);
+const moods = Array.from(new Set(notes.map((note) => note.data.mood)));
+---
+
+<BaseLayout title="笔记" description={`${siteConfig.title} 的灵感碎片与随手记录。`}>
+  <section class="page-hero">
+    <Aurora />
+    <div class="container page-hero-inner">
+      <div class="page-eyebrow"><span></span>FRAGMENTS & THOUGHTS</div>
+      <h1 transition:name="page-heading">随手<em>记</em></h1>
+      <p>比文章更轻，比日记更公开。这里放那些还没长成完整想法，却已经值得被留下来的片段。</p>
+      <div class="hero-count"><Icon name="sparkles" size={14} /> 共 {notes.length} 条碎片 · {moods.length} 种心情</div>
+    </div>
+  </section>
+
+  <section class="section-tight notes-section">
+    <div class="container">
+      <div class="toolbar">
+        <div class="filters" role="group" aria-label="按心情筛选">
+          <button class="filter-pill is-active" type="button" data-filter="all">全部 <span>{notes.length}</span></button>
+          {moods.map((mood) => (
+            <button class="filter-pill" type="button" data-filter={mood}>
+              {mood} <span>{notes.filter((n) => n.data.mood === mood).length}</span>
+            </button>
+          ))}
+        </div>
+        <span class="toolbar-note"><Icon name="compass" size={14} /> 按时间倒序排列</span>
+      </div>
+
+      <div class="notes-grid" data-post-grid data-view="grid">
+        {notes.map((note, i) => (
+          <div class="grid-cell" data-post-card data-tags={note.data.mood}>
+            <NoteCard note={note} index={i} />
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .page-hero {
+    position: relative;
+    overflow: hidden;
+    padding-block: clamp(4rem, 9vw, 7rem) clamp(3rem, 6vw, 4.5rem);
+    border-bottom: 1px solid var(--line);
+  }
+  .page-hero-inner { position: relative; z-index: 1; }
+  .page-eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    color: var(--indigo);
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.22em;
+  }
+  .page-eyebrow span { width: 1.6rem; height: 1px; background: currentColor; }
+  h1 {
+    margin-top: 1.2rem;
+    font-family: var(--font-serif);
+    font-size: clamp(2.8rem, 7vw, 5.2rem);
+    font-weight: 600;
+    letter-spacing: -0.05em;
+  }
+  h1 em { font-style: normal; color: var(--indigo); }
+  .page-hero p {
+    max-width: 36rem;
+    margin-top: 1.3rem;
+    color: var(--muted);
+    font-size: 0.98rem;
+    line-height: 1.9;
+  }
+  .hero-count {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    margin-top: 1.8rem;
+    color: var(--faint);
+    font-size: 0.76rem;
+    font-family: var(--font-mono);
+  }
+  .toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 2.2rem;
+    padding-bottom: 1.4rem;
+    border-bottom: 1px solid var(--line);
+  }
+  .filters { display: flex; flex-wrap: wrap; gap: 0.45rem; }
+  .filter-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.45rem 0.9rem;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-full);
+    background: var(--surface);
+    color: var(--muted);
+    font-size: 0.78rem;
+    transition: all var(--t-fast);
+  }
+  .filter-pill span { font-family: var(--font-mono); font-size: 0.65rem; opacity: 0.7; }
+  .filter-pill:hover { color: var(--ink); transform: translateY(-1px); }
+  .filter-pill.is-active { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+  .toolbar-note {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: var(--faint);
+    font-size: 0.76rem;
+  }
+  .notes-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1.3rem;
+  }
+  .grid-cell { min-width: 0; perspective: 1100px; }
+  .grid-cell.is-filtered-out { display: none; }
+  @media (max-width: 980px) { .notes-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 640px) { .notes-grid { grid-template-columns: 1fr; } }
+</style>

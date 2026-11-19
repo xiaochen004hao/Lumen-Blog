@@ -1,0 +1,132 @@
+---
+import Icon from './Icon.astro';
+
+interface Heading {
+  depth: number;
+  slug: string;
+  text: string;
+}
+interface Props {
+  headings: Heading[];
+}
+const { headings } = Astro.props;
+const items = headings.filter((h) => h.depth === 2 || h.depth === 3);
+---
+
+{items.length > 0 && (
+  <aside class="toc" data-toc aria-label="文章目录">
+    <div class="toc-header"><Icon name="compass" size={15} /><span>目录</span><small data-toc-percent>0%</small></div>
+    <nav class="toc-list">
+      {items.map((h) => (
+        <a
+          href={`#${h.slug}`}
+          class:list={['toc-item', { 'toc-sub': h.depth === 3 }]}
+          data-toc-link={h.slug}
+        >
+          <span class="toc-dot"></span>
+          <span class="toc-text">{h.text}</span>
+        </a>
+      ))}
+    </nav>
+    <div class="toc-track"><span data-toc-progress></span></div>
+    <div class="toc-foot">CHAPTERS · {items.length}</div>
+  </aside>
+)}
+
+<style>
+  .toc {
+    padding-left: 1.4rem;
+    border-left: 1px solid var(--line);
+  }
+  .toc-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1.1rem;
+    color: var(--ember);
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+  }
+  .toc-header small {
+    margin-left: auto;
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    font-weight: 500;
+    letter-spacing: 0;
+    color: var(--faint);
+  }
+  .toc-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    max-height: 58vh;
+    overflow-y: auto;
+    scrollbar-width: none;
+  }
+  .toc-list::-webkit-scrollbar {
+    display: none;
+  }
+  .toc-item {
+    position: relative;
+    display: flex;
+    align-items: baseline;
+    gap: 0.6rem;
+    padding: 0.42rem 0;
+    color: var(--muted);
+    font-size: 0.8rem;
+    line-height: 1.5;
+    transition: color var(--t-fast), transform var(--t-fast);
+  }
+  .toc-item.toc-sub {
+    padding-left: 1rem;
+    font-size: 0.76rem;
+  }
+  .toc-item:hover {
+    color: var(--ink);
+    transform: translateX(2px);
+  }
+  .toc-item.is-active {
+    color: var(--ember);
+    font-weight: 600;
+  }
+  .toc-dot {
+    flex: none;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--line-strong);
+    transform: translateY(-2px);
+    transition: all var(--t-fast);
+  }
+  .toc-item.is-active .toc-dot {
+    background: var(--ember);
+    box-shadow: 0 0 0 4px var(--ember-soft);
+  }
+  .toc-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .toc-track {
+    height: 2px;
+    margin-top: 1.2rem;
+    border-radius: 2px;
+    background: var(--line);
+    overflow: hidden;
+  }
+  .toc-track span {
+    display: block;
+    height: 100%;
+    width: 0;
+    background: var(--ember);
+    transition: width 100ms linear;
+  }
+  .toc-foot {
+    margin-top: 0.7rem;
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.14em;
+    color: var(--faint);
+  }
+</style>

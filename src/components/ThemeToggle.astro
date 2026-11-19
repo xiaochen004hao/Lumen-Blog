@@ -1,0 +1,47 @@
+---
+import Icon from './Icon.astro';
+---
+
+<button class="theme-toggle btn-icon" type="button" data-theme-toggle aria-label="切换深浅主题" title="切换主题 (T)">
+  <span class="icon-sun"><Icon name="sun" size={18} /></span>
+  <span class="icon-moon"><Icon name="moon" size={18} /></span>
+</button>
+
+<style>
+  .theme-toggle {
+    position: relative;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+  }
+  .theme-toggle :global(svg) {
+    grid-area: 1 / 1;
+    transition: transform 500ms var(--ease-spring), opacity 320ms var(--ease-out);
+  }
+  .icon-sun {
+    grid-area: 1 / 1;
+    display: grid;
+    place-items: center;
+  }
+  .icon-moon {
+    grid-area: 1 / 1;
+    display: grid;
+    place-items: center;
+  }
+  :global([data-theme='light']) .icon-sun :global(svg) {
+    transform: rotate(-90deg) scale(0.4);
+    opacity: 0;
+  }
+  :global([data-theme='light']) .icon-moon :global(svg) {
+    transform: rotate(0) scale(1);
+    opacity: 1;
+  }
+  :global([data-theme='dark']) .icon-sun :global(svg) {
+    transform: rotate(0) scale(1);
+    opacity: 1;
+  }
+  :global([data-theme='dark']) .icon-moon :global(svg) {
+    transform: rotate(90deg) scale(0.4);
+    opacity: 0;
+  }
+</style>

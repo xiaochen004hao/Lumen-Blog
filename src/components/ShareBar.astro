@@ -1,0 +1,95 @@
+---
+import Icon from './Icon.astro';
+
+interface Props {
+  title: string;
+  url: string;
+}
+const { title, url } = Astro.props;
+const enc = encodeURIComponent;
+const links = {
+  weibo: `https://service.weibo.com/share/share.php?url=${enc(url)}&title=${enc(title)}`,
+  qzone: `https://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?url=${enc(url)}&title=${enc(title)}`,
+  x: `https://twitter.com/intent/tweet?text=${enc(title)}&url=${enc(url)}`,
+  telegram: `https://t.me/share/url?url=${enc(url)}&text=${enc(title)}`,
+  mailto: `mailto:?subject=${enc(title)}&body=${enc(url)}`,
+};
+---
+
+<div class="share-bar" data-share-bar data-share-url={url}>
+  <span class="share-label">分享</span>
+  <div class="share-actions">
+    <button type="button" data-share-native aria-label="系统分享" title="系统分享"><Icon name="share" size={15} /></button>
+    <button type="button" data-share-copy aria-label="复制链接" title="复制链接"><Icon name="link" size={15} /></button>
+    <a href={links.weibo} target="_blank" rel="noopener" aria-label="分享到微博" title="微博"><span class="zh">微</span></a>
+    <a href={links.qzone} target="_blank" rel="noopener" aria-label="分享到 QQ 空间" title="QQ 空间"><span class="zh">圈</span></a>
+    <a href={links.x} target="_blank" rel="noopener" aria-label="分享到 X" title="X"><Icon name="twitter" size={15} /></a>
+    <a href={links.telegram} target="_blank" rel="noopener" aria-label="分享到 Telegram" title="Telegram"><Icon name="send" size={15} /></a>
+    <a href={links.mailto} aria-label="邮件分享" title="邮件"><Icon name="mail" size={15} /></a>
+  </div>
+  <span class="share-toast" data-share-toast>已复制</span>
+</div>
+
+<style>
+  .share-bar {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  .share-label {
+    font-size: 0.74rem;
+    font-weight: 650;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+  }
+  .share-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+  }
+  .share-actions a,
+  .share-actions button {
+    display: grid;
+    place-items: center;
+    width: 2.1rem;
+    height: 2.1rem;
+    border: 1px solid var(--line);
+    border-radius: 50%;
+    background: var(--surface);
+    color: var(--muted);
+    transition: all var(--t-fast) var(--ease-out);
+  }
+  .share-actions .zh {
+    font-size: 0.72rem;
+    font-weight: 650;
+    line-height: 1;
+  }
+  .share-actions a:hover,
+  .share-actions button:hover {
+    color: #fff;
+    background: var(--ember);
+    border-color: var(--ember);
+    transform: translateY(-3px);
+  }
+  .share-toast {
+    position: absolute;
+    left: 50%;
+    bottom: calc(100% + 0.6rem);
+    transform: translate(-50%, 6px);
+    padding: 0.25rem 0.6rem;
+    border-radius: var(--radius-xs);
+    background: var(--ink);
+    color: var(--paper);
+    font-size: 0.7rem;
+    opacity: 0;
+    pointer-events: none;
+    transition: all var(--t-fast);
+    white-space: nowrap;
+  }
+  .share-toast.is-visible {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+</style>

@@ -1,0 +1,127 @@
+---
+/**
+ * Waline 评论区 —— 与站长现有评论服务一致（waline.xc4h.qzz.io）。
+ * 懒加载：滚动到评论区附近才开始初始化，不拖慢首屏。
+ * 主题：跟随站点的 data-theme 切换；客户端换页时自动销毁重建。
+ */
+import { siteConfig } from '../data/site.config';
+import Icon from './Icon.astro';
+---
+
+<section class="comments" data-comments aria-label="评论区">
+  <div class="comments-head">
+    <span class="comments-label"><Icon name="heart" size={16} /> 留言</span>
+    <p class="comments-tip">留下你的想法，我会认真读每一条。</p>
+  </div>
+  <div id="waline-container"></div>
+</section>
+
+<script>
+  import { init } from '@waline/client';
+  import '@waline/client/style';
+  import { siteConfig } from '../data/site.config';
+
+  type WalineInstance = { destroy?: () => void } | null;
+  let instance: WalineInstance = null;
+  let observer: IntersectionObserver | null = null;
+
+  function setupComments() {
+    // The body is replaced on every client-side navigation; rebuild for it.
+    if (document.body.dataset.walineInit === '1') return;
+    const container = document.getElementById('waline-container');
+    if (!container) return;
+    document.body.dataset.walineInit = '1';
+
+    const boot = () => {
+      if (instance) return;
+      instance = init({
+        el: container,
+        serverURL: siteConfig.walineServer,
+        path: location.pathname,
+        lang: 'zh-CN',
+        dark: "html[data-theme='dark']",
+        pageview: true,
+        reaction: false,
+      });
+    };
+
+    // Lazy: don't load comment data or the editor until the reader is close.
+    observer?.disconnect();
+    if ('IntersectionObserver' in window) {
+      observer = new IntersectionObserver(
+        (entries) => {
+          if (entries.some((entry) => entry.isIntersecting)) {
+            boot();
+            observer?.disconnect();
+          }
+        },
+        { rootMargin: '600px 0px' }
+      );
+      observer.observe(container);
+    } else {
+      boot();
+    }
+  }
+
+  document.addEventListener('astro:page-load', setupComments);
+  if (document.readyState !== 'loading') requestAnimationFrame(setupComments);
+
+  document.addEventListener('astro:before-swap', () => {
+    try {
+      instance?.destroy?.();
+    } catch (_) {
+      /* ignore */
+    }
+    instance = null;
+    if (document.body) delete document.body.dataset.walineInit;
+  });
+</script>
+
+<style>
+  .comments {
+    margin-top: 4rem;
+    padding-top: 2.5rem;
+    border-top: 1px solid var(--line);
+  }
+  .comments-head {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    margin-bottom: 1.8rem;
+    flex-wrap: wrap;
+  }
+  .comments-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-family: var(--font-serif);
+    font-size: 1.4rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+  }
+  .comments-label :global(svg) {
+    color: var(--ember);
+  }
+  .comments-tip {
+    color: var(--faint);
+    font-size: 0.8rem;
+  }
+  /* 把 Waline 的变量接到站点设计系统上 */
+  #waline-container {
+    --waline-theme-color: var(--ember);
+    --waline-active-color: var(--ember-bright);
+    --waline-border-color: var(--line);
+    --waline-bgcolor: var(--surface);
+    --waline-info-bgcolor: var(--paper-deep);
+    --waline-info-color: var(--muted);
+    --waline-info-fontsize: 0.8rem;
+    font-family: var(--font-sans);
+  }
+  #waline-container :global(.wl-panel) {
+    border-radius: var(--radius-md);
+  }
+  #waline-container :global(.wl-btn) {
+    border-radius: var(--radius-full);
+  }
+</style>

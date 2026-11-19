@@ -1,0 +1,442 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Aurora from '../components/Aurora.astro';
+import Icon from '../components/Icon.astro';
+import Reveal from '../components/Reveal.astro';
+import Subscribe from '../components/Subscribe.astro';
+import { siteConfig } from '../data/site.config';
+
+const timeline = [
+  { year: '2019', title: '开始记录', body: '把零散的想法放进一个没人看的角落。那时候写作只是整理自己的方式。' },
+  { year: '2021', title: '遇见设计工程', body: '发现设计与代码之间那条模糊而迷人的边界，开始认真对待每一个像素。' },
+  { year: '2023', title: '慢下来', body: '停止追赶热点，把博客改造成一座花园：少而精，允许它慢慢长。' },
+  { year: '2026', title: '现在', body: '继续写、继续做、继续学习。希望十年后回头看，这些文字仍然诚实。' },
+];
+
+const skills = [
+  { group: '设计', items: ['视觉系统', '交互设计', '排版', '动效', '设计工程'] },
+  { group: '开发', items: ['Astro', 'TypeScript', 'CSS', 'Web 性能', '可访问性'] },
+  { group: '写作', items: ['长文', '技术笔记', '编辑校对', '内容架构'] },
+];
+---
+
+<BaseLayout title="关于" description={`认识 ${siteConfig.author.name} —— ${siteConfig.author.role}，以及这座数字花园背后的想法。`}>
+  <section class="about-hero">
+    <Aurora />
+    <div class="container about-hero-grid">
+      <div class="about-intro">
+        <div class="page-eyebrow"><span></span>HELLO, I'M</div>
+        <h1 transition:name="page-heading">你好，我是<em>{siteConfig.author.name}</em>。</h1>
+        <p class="lead">{siteConfig.author.role}。{siteConfig.author.bio}</p>
+        <p class="secondary">我相信好的产品应该像一间光线充足的房间：你走进去，知道该往哪里走，也愿意多待一会儿。</p>
+        <div class="about-actions">
+          <a class="btn btn-primary" href={`mailto:${siteConfig.author.email}`}><Icon name="mail" size={16} /> 给我写信</a>
+          <a class="btn btn-outline" href="/writing">读我的文章 <Icon name="arrow-right" size={15} /></a>
+        </div>
+        <div class="about-facts">
+          <span><Icon name="compass" size={15} /> {siteConfig.author.location}</span>
+          <span><Icon name="sparkles" size={15} /> {siteConfig.author.status}</span>
+        </div>
+      </div>
+      <div class="about-portrait">
+        <div class="portrait-orbit orbit-a"></div>
+        <div class="portrait-orbit orbit-b"></div>
+        <div class="portrait-frame">
+          <img src={siteConfig.author.avatar} alt={siteConfig.author.name} width="420" height="420" />
+          <span class="portrait-badge"><Icon name="heart" size={14} /> Made with care</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section now-section">
+    <div class="container">
+      <Reveal>
+        <div class="section-head">
+          <div>
+            <span class="eyebrow">CURRENTLY</span>
+            <h2 class="section-title">此刻的<em>我</em></h2>
+          </div>
+          <p class="section-desc">一个不定期更新的「现在」清单。它比简历诚实得多。</p>
+        </div>
+      </Reveal>
+      <div class="now-grid">
+        {siteConfig.now.map((item, i) => (
+          <div class="now-card" data-reveal data-spotlight style={`--reveal-delay:${i * 80}ms`}>
+            <span class="now-num">0{i + 1}</span>
+            <span class="now-label">{item.label}</span>
+            <strong>{item.value}</strong>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section timeline-section">
+    <div class="container timeline-grid">
+      <Reveal direction="left">
+        <div class="timeline-intro">
+          <span class="eyebrow">THE JOURNEY</span>
+          <h2 class="section-title">一路<em>走来</em></h2>
+          <p>没有清晰的路线图，只有一些回头看才连得上的点。</p>
+        </div>
+      </Reveal>
+      <div class="timeline">
+        {timeline.map((item, i) => (
+          <div class="timeline-item" data-reveal="right" style={`--reveal-delay:${i * 90}ms`}>
+            <span class="timeline-year">{item.year}</span>
+            <span class="timeline-node"></span>
+            <div>
+              <h3>{item.title}</h3>
+              <p>{item.body}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section skills-section">
+    <div class="container">
+      <Reveal>
+        <div class="section-head">
+          <div>
+            <span class="eyebrow">TOOLBOX</span>
+            <h2 class="section-title">常用<em>工具</em></h2>
+          </div>
+        </div>
+      </Reveal>
+      <div class="skills-grid">
+        {skills.map((group, i) => (
+          <div class="skill-group" data-reveal data-spotlight style={`--reveal-delay:${i * 90}ms`}>
+            <h3><span>0{i + 1}</span>{group.group}</h3>
+            <div class="skill-tags">
+              {group.items.map((item) => <span class="tag">{item}</span>)}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <Reveal>
+        <blockquote class="big-quote">
+          <Icon name="quote" size={30} />
+          <p>把复杂留给自己，把简单留给别人。<br />把留白留给想象，把时间留给重要的事。</p>
+          <cite>— 我的工作准则</cite>
+        </blockquote>
+      </Reveal>
+    </div>
+  </section>
+
+  <section class="section-tight contact-section">
+    <div class="container">
+      <Reveal spotlight>
+        <div class="contact-card">
+          <div>
+            <span class="eyebrow">LET'S TALK</span>
+            <h2>有想法？<em>聊聊看。</em></h2>
+            <p>如果你正在做一件有趣的事，或者只是想打个招呼，我的收件箱永远为你敞开。</p>
+          </div>
+          <a class="btn btn-primary" href={`mailto:${siteConfig.author.email}`}>{siteConfig.author.email}<Icon name="arrow-up-right" size={16} /></a>
+        </div>
+      </Reveal>
+    </div>
+  </section>
+
+  <section class="section-tight subscribe-section">
+    <div class="container"><Subscribe /></div>
+  </section>
+</BaseLayout>
+
+<style>
+  .about-hero {
+    position: relative;
+    overflow: hidden;
+    padding-block: clamp(4rem, 9vw, 7rem) clamp(4rem, 8vw, 6rem);
+  }
+  .about-hero-grid {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    align-items: center;
+    gap: clamp(2rem, 6vw, 5rem);
+  }
+  .page-eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    color: var(--ember);
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.22em;
+  }
+  .page-eyebrow span { width: 1.6rem; height: 1px; background: currentColor; }
+  h1 {
+    margin-top: 1.3rem;
+    font-family: var(--font-serif);
+    font-size: clamp(2.8rem, 6.5vw, 5rem);
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: -0.05em;
+  }
+  h1 em {
+    font-style: normal;
+    background: linear-gradient(110deg, var(--ember), var(--indigo));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .lead {
+    max-width: 36rem;
+    margin-top: 1.6rem;
+    color: var(--ink-soft);
+    font-size: 1.05rem;
+    line-height: 2;
+  }
+  .secondary {
+    max-width: 34rem;
+    margin-top: 1rem;
+    color: var(--muted);
+    font-size: 0.92rem;
+    line-height: 1.95;
+  }
+  .about-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 2.2rem;
+  }
+  .about-facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.6rem;
+    margin-top: 2.5rem;
+    color: var(--muted);
+    font-size: 0.8rem;
+  }
+  .about-facts span { display: inline-flex; align-items: center; gap: 0.45rem; }
+  .about-facts svg { color: var(--ember); }
+
+  .about-portrait {
+    position: relative;
+    display: grid;
+    place-items: center;
+    min-height: 420px;
+  }
+  .portrait-orbit {
+    position: absolute;
+    border: 1px dashed var(--line-strong);
+    border-radius: 50%;
+  }
+  .orbit-a { width: 100%; aspect-ratio: 1; animation: spin-slow 60s linear infinite; }
+  .orbit-b { width: 80%; aspect-ratio: 1; border-style: solid; border-color: var(--line); animation: spin-slow 40s linear infinite reverse; }
+  .portrait-frame {
+    position: relative;
+    z-index: 1;
+    width: min(78%, 340px);
+    aspect-ratio: 1;
+    border: 6px solid var(--surface);
+    border-radius: 50%;
+    overflow: visible;
+    box-shadow: var(--shadow-lg);
+    transform: rotate(-3deg);
+    transition: transform 700ms var(--ease-spring);
+  }
+  .about-portrait:hover .portrait-frame { transform: rotate(0) scale(1.03); }
+  .portrait-frame img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+  .portrait-badge {
+    position: absolute;
+    right: -6%;
+    bottom: 8%;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem 0.9rem;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-full);
+    background: var(--surface);
+    color: var(--ember);
+    font-size: 0.7rem;
+    font-weight: 650;
+    box-shadow: var(--shadow-sm);
+    animation: float-card 6s var(--ease-in-out) infinite;
+  }
+
+  .now-section { background: var(--paper-deep); border-block: 1px solid var(--line); }
+  .now-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.2rem; }
+  .now-card {
+    position: relative;
+    padding: 1.8rem 1.5rem;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-md);
+    background: var(--surface);
+  }
+  .now-num {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--ember);
+  }
+  .now-label {
+    display: block;
+    margin-top: 1rem;
+    color: var(--muted);
+    font-size: 0.76rem;
+  }
+  .now-card strong {
+    display: block;
+    margin-top: 0.4rem;
+    font-family: var(--font-serif);
+    font-size: 1.05rem;
+    font-weight: 600;
+    line-height: 1.5;
+  }
+
+  .timeline-grid {
+    display: grid;
+    grid-template-columns: 0.8fr 1.2fr;
+    gap: clamp(2rem, 6vw, 6rem);
+  }
+  .timeline-intro p {
+    max-width: 20rem;
+    margin-top: 1.2rem;
+    color: var(--muted);
+    font-size: 0.9rem;
+    line-height: 1.9;
+  }
+  .timeline { position: relative; padding-left: 2rem; }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 5px;
+    top: 0.5rem;
+    bottom: 0.5rem;
+    width: 1px;
+    background: var(--line-strong);
+  }
+  .timeline-item {
+    position: relative;
+    padding-bottom: 2.6rem;
+  }
+  .timeline-item:last-child { padding-bottom: 0; }
+  .timeline-node {
+    position: absolute;
+    left: -2.06rem;
+    top: 0.55rem;
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: var(--paper);
+    border: 2px solid var(--ember);
+    box-shadow: 0 0 0 4px var(--ember-soft);
+  }
+  .timeline-year {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--ember);
+  }
+  .timeline-item h3 {
+    margin-top: 0.4rem;
+    font-family: var(--font-serif);
+    font-size: 1.3rem;
+  }
+  .timeline-item p {
+    max-width: 32rem;
+    margin-top: 0.5rem;
+    color: var(--muted);
+    font-size: 0.87rem;
+    line-height: 1.85;
+  }
+
+  .skills-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.3rem; }
+  .skill-group {
+    padding: 1.8rem;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+  }
+  .skill-group h3 {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    font-family: var(--font-serif);
+    font-size: 1.35rem;
+  }
+  .skill-group h3 span {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--ember);
+  }
+  .skill-tags { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.4rem; }
+  .big-quote {
+    margin: 4rem 0 0;
+    padding: clamp(2rem, 5vw, 3.5rem);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-xl);
+    background:
+      radial-gradient(circle at 85% 15%, var(--ember-soft), transparent 45%),
+      var(--surface);
+    text-align: center;
+    color: var(--ember);
+  }
+  .big-quote p {
+    margin-top: 1.3rem;
+    font-family: var(--font-serif);
+    font-size: clamp(1.4rem, 3.5vw, 2.3rem);
+    line-height: 1.6;
+    color: var(--ink);
+    letter-spacing: -0.02em;
+  }
+  .big-quote cite {
+    display: block;
+    margin-top: 1.5rem;
+    color: var(--muted);
+    font-size: 0.78rem;
+    font-style: normal;
+  }
+
+  .contact-card {
+    /* Deliberately inverted panel: stays dark in both themes, so accents
+       never end up as pale text on a pale background. */
+    background: #17171b;
+    color: #f2f1ec;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 2rem;
+    padding: clamp(2rem, 5vw, 3.5rem);
+    border-radius: var(--radius-xl);
+  }
+  .contact-card .eyebrow { color: var(--ember-bright); }
+  .contact-card h2 {
+    margin-top: 0.8rem;
+    font-family: var(--font-serif);
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+  }
+  .contact-card h2 em { font-style: normal; color: var(--ember-bright); }
+  .contact-card p {
+    max-width: 32rem;
+    margin-top: 0.9rem;
+    color: rgba(242, 241, 236, 0.7);
+    font-size: 0.9rem;
+    line-height: 1.9;
+  }
+  .contact-card .btn { background: #f2f1ec; color: #17171b; }
+
+  @media (max-width: 980px) {
+    .about-hero-grid,
+    .timeline-grid { grid-template-columns: 1fr; }
+    .about-portrait { min-height: 340px; }
+    .now-grid,
+    .skills-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 600px) {
+    .now-grid, .skills-grid { grid-template-columns: 1fr; }
+  }
+</style>

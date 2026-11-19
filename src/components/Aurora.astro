@@ -1,0 +1,118 @@
+---
+/** Pure-CSS ambient background: three drifting gradient orbs + hairline grid. */
+interface Props {
+  class?: string;
+}
+const { class: className = '' } = Astro.props;
+---
+
+<div class:list={['aurora', className]} aria-hidden="true">
+  <div class="grid"></div>
+  <div class="orb orb-one"></div>
+  <div class="orb orb-two"></div>
+  <div class="orb orb-three"></div>
+  <div class="vignette"></div>
+</div>
+
+<style>
+  .aurora {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+    border-radius: inherit;
+  }
+
+  .grid {
+    position: absolute;
+    inset: -1px;
+    background-image: linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
+    background-size: 64px 64px;
+    mask-image: radial-gradient(ellipse 75% 65% at 50% 40%, #000 20%, transparent 100%);
+    -webkit-mask-image: radial-gradient(ellipse 75% 65% at 50% 40%, #000 20%, transparent 100%);
+  }
+
+  .orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(70px);
+    will-change: transform;
+  }
+
+  .orb-one {
+    width: 46vw;
+    height: 46vw;
+    min-width: 420px;
+    min-height: 420px;
+    top: -16%;
+    right: -6%;
+    background: radial-gradient(circle at 35% 35%, rgba(15, 118, 110, 0.36), rgba(15, 118, 110, 0) 68%);
+    animation: orb-float-3d 18s var(--ease-in-out) infinite;
+  }
+
+  .orb-two {
+    width: 40vw;
+    height: 40vw;
+    min-width: 360px;
+    min-height: 360px;
+    bottom: -22%;
+    left: -8%;
+    background: radial-gradient(circle at 60% 40%, rgba(43, 109, 158, 0.32), rgba(43, 109, 158, 0) 70%);
+    animation: orb-float-3d 22s var(--ease-in-out) infinite reverse;
+  }
+
+  .orb-three {
+    width: 26vw;
+    height: 26vw;
+    min-width: 240px;
+    min-height: 240px;
+    top: 32%;
+    left: 46%;
+    background: radial-gradient(circle at 50% 50%, rgba(255, 183, 94, 0.22), transparent 70%);
+    animation: orb-drift-3d 15s ease-in-out infinite;
+  }
+
+  /* Slow 3D somersaults — the blobs read as volumetric light, not flat blobs */
+  @keyframes orb-float-3d {
+    0%,
+    100% {
+      transform: translate3d(0, 0, 0) scale(1) rotate3d(1, 1, 0, 0deg);
+    }
+    33% {
+      transform: translate3d(4%, -6%, 0) scale(1.08) rotate3d(1, -1, 0, 12deg);
+    }
+    66% {
+      transform: translate3d(-5%, 4%, 0) scale(0.95) rotate3d(-1, 1, 0, -9deg);
+    }
+  }
+  @keyframes orb-drift-3d {
+    0%,
+    100% {
+      transform: translate3d(0, 0, 0) rotate3d(0, 1, 0, 0deg);
+    }
+    50% {
+      transform: translate3d(3%, -4%, 0) rotate3d(1, 0, 1, 14deg);
+    }
+  }
+
+  :global([data-theme='dark']) .orb-one {
+    background: radial-gradient(circle at 35% 35%, rgba(94, 234, 212, 0.18), transparent 68%);
+  }
+  :global([data-theme='dark']) .orb-two {
+    background: radial-gradient(circle at 60% 40%, rgba(86, 184, 224, 0.2), transparent 70%);
+  }
+
+  .vignette {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 90% 80% at 50% 45%, transparent 40%, var(--paper) 100%);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .orb {
+      animation: none !important;
+    }
+  }
+</style>

@@ -1,0 +1,19 @@
+---
+interface Props {
+  as?: keyof HTMLElementTagNameMap;
+  delay?: number;
+  direction?: 'up' | 'left' | 'right' | 'scale';
+  class?: string;
+  spotlight?: boolean;
+}
+const { as: Tag = 'div', delay = 0, direction = 'up', class: className = '', spotlight = false } = Astro.props;
+---
+
+<Tag
+  class={className}
+  data-reveal={direction === 'up' ? '' : direction}
+  data-spotlight={spotlight ? '' : undefined}
+  style={`--reveal-delay:${delay}ms`}
+>
+  <slot />
+</Tag>
