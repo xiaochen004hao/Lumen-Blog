@@ -19,7 +19,7 @@ const links = {
 <div class="share-bar" data-share-bar data-share-url={url}>
   <span class="share-label">分享</span>
   <div class="share-actions">
-    <button type="button" data-share-native aria-label="系统分享" title="系统分享"><Icon name="share" size={15} /></button>
+    <button type="button" data-share-native hidden aria-label="系统分享" title="系统分享"><Icon name="share" size={15} /></button>
     <button type="button" data-share-copy aria-label="复制链接" title="复制链接"><Icon name="link" size={15} /></button>
     <a href={links.weibo} target="_blank" rel="noopener" aria-label="分享到微博" title="微博"><span class="zh">微</span></a>
     <a href={links.qzone} target="_blank" rel="noopener" aria-label="分享到 QQ 空间" title="QQ 空间"><span class="zh">圈</span></a>
@@ -60,6 +60,9 @@ const links = {
     background: var(--surface);
     color: var(--muted);
     transition: all var(--t-fast) var(--ease-out);
+  }
+  .share-actions [hidden] {
+    display: none;
   }
   .share-actions .zh {
     font-size: 0.72rem;

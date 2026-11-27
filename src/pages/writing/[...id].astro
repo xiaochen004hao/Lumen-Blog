@@ -2,17 +2,21 @@
 import { getCollection, render } from 'astro:content';
 import PostLayout from '../../layouts/PostLayout.astro';
 import PostCard from '../../components/PostCard.astro';
+import PostNavigation from '../../components/PostNavigation.astro';
 import Reveal from '../../components/Reveal.astro';
 import { mdxComponents } from '../../utils/mdx-components';
+import { entrySlug } from '../../utils/format';
 
 export async function getStaticPaths() {
   const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort(
     (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
   );
-  return posts.map((post) => ({
-    params: { id: post.id },
+  return posts.map((post, index) => ({
+    params: { id: entrySlug(post) },
     props: {
       post,
+      previous: posts[index - 1],
+      next: posts[index + 1],
       related: posts
         .filter((other) => other.id !== post.id)
         .map((other) => ({
@@ -26,12 +30,16 @@ export async function getStaticPaths() {
   }));
 }
 
-const { post, related } = Astro.props;
+const { post, related, previous, next } = Astro.props;
 const { Content, headings } = await render(post);
 ---
 
 <PostLayout post={post} headings={headings}>
   <Content components={mdxComponents} />
+
+  <div slot="navigation">
+    <PostNavigation previous={previous} next={next} />
+  </div>
 
   <div slot="related">
     {related.length > 0 && (

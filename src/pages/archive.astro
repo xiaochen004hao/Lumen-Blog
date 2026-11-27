@@ -1,0 +1,228 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Aurora from '../components/Aurora.astro';
+import Icon from '../components/Icon.astro';
+import { entrySlug, formatDate } from '../utils/format';
+import { siteConfig } from '../data/site.config';
+
+const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort(
+  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+);
+const notes = (await getCollection('notes', ({ data }) => !data.draft)).sort(
+  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+);
+
+const entries = [
+  ...posts.map((post) => ({
+    id: entrySlug(post),
+    title: post.data.title,
+    date: post.data.pubDate,
+    type: '文章' as const,
+    href: `/writing/${entrySlug(post)}`,
+    tags: post.data.tags,
+  })),
+  ...notes.map((note) => ({
+    id: entrySlug(note),
+    title: note.data.title,
+    date: note.data.pubDate,
+    type: '笔记' as const,
+    href: `/notes/${entrySlug(note)}`,
+    tags: note.data.tags,
+  })),
+].sort((a, b) => b.date.valueOf() - a.date.valueOf());
+
+const years = Array.from(new Set(entries.map((entry) => entry.date.getFullYear())));
+---
+
+<BaseLayout title="归档" description={`按时间回看 ${siteConfig.title} 的全部文章与笔记。`}>
+  <section class="page-hero">
+    <Aurora />
+    <div class="container page-hero-inner">
+      <div class="page-eyebrow"><span></span>THROUGH THE YEARS</div>
+      <h1 transition:name="page-heading">时间<em>归档</em></h1>
+      <p>把写过的文字放回它发生的时间。偶尔回头看，会发现一些当时没注意到的线索。</p>
+      <div class="hero-count"><Icon name="calendar" size={14} /> {entries.length} 篇内容 · {years.length} 个年份</div>
+    </div>
+  </section>
+
+  <section class="section-tight archive-section">
+    <div class="container archive-layout">
+      <aside class="archive-index" aria-label="年份导航">
+        <span class="eyebrow">JUMP TO</span>
+        {years.map((year) => (
+          <a href={`#year-${year}`}><span>{year}</span><small>{entries.filter((entry) => entry.date.getFullYear() === year).length}</small></a>
+        ))}
+      </aside>
+
+      <div class="archive-stream">
+        {years.map((year) => (
+          <section class="archive-year" id={`year-${year}`}>
+            <div class="year-head">
+              <h2>{year}</h2>
+              <span>{entries.filter((entry) => entry.date.getFullYear() === year).length} 篇</span>
+            </div>
+            <div class="year-entries">
+              {entries.filter((entry) => entry.date.getFullYear() === year).map((entry) => (
+                <a class="archive-entry" href={entry.href}>
+                  <time datetime={entry.date.toISOString().slice(0, 10)}>{formatDate(entry.date, 'short')}</time>
+                  <span class:list={['entry-type', entry.type === '笔记' ? 'note' : 'article']}>{entry.type}</span>
+                  <strong>{entry.title}</strong>
+                  <span class="entry-tags">{entry.tags.slice(0, 2).map((tag) => `#${tag}`).join(' ')}</span>
+                  <Icon name="arrow-up-right" size={15} />
+                </a>
+              ))}
+            </div>
+          </section>
+        ))}
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .page-hero {
+    position: relative;
+    overflow: hidden;
+    padding-block: clamp(4rem, 9vw, 7rem) clamp(3rem, 6vw, 4.5rem);
+    border-bottom: 1px solid var(--line);
+  }
+  .page-hero-inner { position: relative; z-index: 1; }
+  .page-eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    color: var(--ember);
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.22em;
+  }
+  .page-eyebrow span { width: 1.6rem; height: 1px; background: currentColor; }
+  h1 {
+    margin-top: 1.2rem;
+    font-family: var(--font-serif);
+    font-size: clamp(2.8rem, 7vw, 5.2rem);
+    font-weight: 600;
+    letter-spacing: -0.05em;
+  }
+  h1 em { font-style: normal; color: var(--ember); }
+  .page-hero p {
+    max-width: 36rem;
+    margin-top: 1.3rem;
+    color: var(--muted);
+    line-height: 1.9;
+  }
+  .hero-count {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    margin-top: 1.8rem;
+    color: var(--faint);
+    font-family: var(--font-mono);
+    font-size: 0.76rem;
+  }
+
+  .archive-layout {
+    display: grid;
+    grid-template-columns: 160px minmax(0, 1fr);
+    gap: clamp(2rem, 6vw, 5rem);
+    align-items: start;
+  }
+  .archive-index {
+    position: sticky;
+    top: calc(var(--header-h) + 2rem);
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+  .archive-index .eyebrow { margin-bottom: 0.8rem; }
+  .archive-index a {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.55rem 0.7rem;
+    border-radius: var(--radius-sm);
+    color: var(--muted);
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    transition: background var(--t-fast), color var(--t-fast);
+  }
+  .archive-index a:hover {
+    background: var(--ember-soft);
+    color: var(--ember);
+  }
+  .archive-index small { color: var(--faint); font-size: 0.65rem; }
+
+  .archive-year { scroll-margin-top: calc(var(--header-h) + 2rem); }
+  .archive-year + .archive-year { margin-top: 4rem; }
+  .year-head {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--line-strong);
+  }
+  .year-head h2 {
+    font-family: var(--font-serif);
+    font-size: clamp(2.4rem, 5vw, 3.8rem);
+    font-weight: 600;
+    letter-spacing: -0.04em;
+  }
+  .year-head span { color: var(--faint); font-family: var(--font-mono); font-size: 0.72rem; }
+  .year-entries { display: flex; flex-direction: column; }
+  .archive-entry {
+    display: grid;
+    grid-template-columns: 76px 48px minmax(0, 1fr) minmax(90px, auto) 18px;
+    align-items: center;
+    gap: 0.9rem;
+    padding: 1rem 0.4rem;
+    border-bottom: 1px solid var(--line);
+    transition: padding var(--t-fast), background var(--t-fast);
+  }
+  .archive-entry:hover {
+    padding-inline: 0.9rem;
+    background: var(--ember-soft);
+  }
+  .archive-entry time,
+  .entry-tags {
+    color: var(--faint);
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+  }
+  .entry-type {
+    display: inline-flex;
+    justify-content: center;
+    padding: 0.2rem 0.45rem;
+    border-radius: var(--radius-full);
+    font-size: 0.64rem;
+    font-weight: 650;
+  }
+  .entry-type.article { background: var(--ember-soft); color: var(--ember); }
+  .entry-type.note { background: var(--indigo-soft); color: var(--indigo); }
+  .archive-entry strong {
+    overflow: hidden;
+    font-family: var(--font-serif);
+    font-size: 1.02rem;
+    font-weight: 600;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .archive-entry svg { color: var(--faint); }
+  .archive-entry:hover svg { color: var(--ember); }
+
+  @media (max-width: 760px) {
+    .archive-layout { grid-template-columns: 1fr; }
+    .archive-index {
+      position: static;
+      flex-direction: row;
+      overflow-x: auto;
+      padding-bottom: 0.4rem;
+    }
+    .archive-index .eyebrow { display: none; }
+    .archive-index a { flex: none; gap: 0.6rem; }
+    .archive-entry {
+      grid-template-columns: 68px 44px minmax(0, 1fr) 16px;
+    }
+    .entry-tags { display: none; }
+  }
+</style>

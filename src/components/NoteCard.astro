@@ -1,7 +1,7 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 import Icon from './Icon.astro';
-import { formatDate, plainText, tagUrl } from '../utils/format';
+import { entrySlug, formatDate, plainText, tagUrl } from '../utils/format';
 
 interface Props {
   note: CollectionEntry<'notes'>;
@@ -17,13 +17,13 @@ const summary = description ?? plainText(note.body, 110);
     <span class="mood"><Icon name="sparkles" size={13} />{mood}</span>
     <time datetime={pubDate.toISOString().slice(0, 10)}>{formatDate(pubDate, 'short')}</time>
   </div>
-  <h3><a href={`/notes/${note.id}`}>{title}</a></h3>
+  <h3><a href={`/notes/${entrySlug(note)}`}>{title}</a></h3>
   <p>{summary}</p>
   <div class="note-bottom">
     <div class="tags">
       {tags.slice(0, 3).map((tag) => <a class="tag" href={tagUrl(tag)}>#{tag}</a>)}
     </div>
-    <a class="note-link" href={`/notes/${note.id}`} aria-label={`阅读笔记：${title}`}>
+    <a class="note-link" href={`/notes/${entrySlug(note)}`} aria-label={`阅读笔记：${title}`}>
       <Icon name="arrow-up-right" size={15} />
     </a>
   </div>

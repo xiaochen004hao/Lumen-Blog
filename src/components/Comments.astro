@@ -4,7 +4,6 @@
  * 懒加载：滚动到评论区附近才开始初始化，不拖慢首屏。
  * 主题：跟随站点的 data-theme 切换；客户端换页时自动销毁重建。
  */
-import { siteConfig } from '../data/site.config';
 import Icon from './Icon.astro';
 ---
 
@@ -34,6 +33,16 @@ import Icon from './Icon.astro';
 
     const boot = () => {
       if (instance) return;
+      if (!navigator.onLine) {
+        container.innerHTML = '<p class="comments-offline">当前离线，联网后会自动加载评论。</p>';
+        const retry = () => {
+          window.removeEventListener('online', retry);
+          if (container.isConnected) boot();
+        };
+        window.addEventListener('online', retry, { once: true });
+        return;
+      }
+      container.innerHTML = '';
       instance = init({
         el: container,
         serverURL: siteConfig.walineServer,
@@ -107,21 +116,268 @@ import Icon from './Icon.astro';
     color: var(--faint);
     font-size: 0.8rem;
   }
-  /* 把 Waline 的变量接到站点设计系统上 */
+  .comments-offline {
+    padding: 1rem 1.1rem;
+    border: 1px dashed var(--line-strong);
+    border-radius: var(--radius-md);
+    background: var(--paper-deep);
+    color: var(--muted);
+    font-size: 0.82rem;
+    text-align: center;
+  }
+  /* Waline 3 design tokens -> Lumen design system */
   #waline-container {
+    --waline-font-size: 0.92rem;
+    --waline-color: var(--ink-soft);
     --waline-theme-color: var(--ember);
     --waline-active-color: var(--ember-bright);
+    --waline-bg-color: var(--surface);
+    --waline-bg-color-light: var(--paper-deep);
+    --waline-bg-color-hover: var(--ember-soft);
     --waline-border-color: var(--line);
-    --waline-bgcolor: var(--surface);
-    --waline-info-bgcolor: var(--paper-deep);
-    --waline-info-color: var(--muted);
-    --waline-info-fontsize: 0.8rem;
+    --waline-disable-bg-color: var(--paper-deep);
+    --waline-disable-color: var(--faint);
+    --waline-code-bg-color: #12131a;
+    --waline-warning-color: var(--rose);
+    --waline-warning-bg-color: color-mix(in srgb, var(--rose) 10%, transparent);
+    --waline-bq-color: var(--ember-soft);
+    --waline-avatar-size: 2.75rem;
+    --waline-avatar-radius: 50%;
+    --waline-box-shadow: var(--shadow-sm);
+    --waline-badge-color: var(--indigo);
+    --waline-info-bg-color: var(--paper-deep);
+    --waline-info-color: var(--faint);
+    --waline-info-font-size: 0.7rem;
     font-family: var(--font-sans);
   }
+
+  #waline-container :global([data-waline]) {
+    color: var(--ink-soft);
+    font-family: var(--font-sans);
+    letter-spacing: 0.01em;
+  }
+  #waline-container :global([data-waline] p) {
+    color: var(--ink-soft);
+  }
   #waline-container :global(.wl-panel) {
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+  }
+  #waline-container :global(.wl-header) {
+    border-bottom: 1px solid var(--line);
+    background: var(--paper-deep);
+  }
+  #waline-container :global(.wl-header label) {
+    color: var(--muted);
+    font-weight: 600;
+  }
+  #waline-container :global(.wl-header input) {
+    color: var(--ink);
+    font-family: var(--font-sans);
+  }
+  #waline-container :global(.wl-header input:focus) {
+    background: var(--surface);
+  }
+  #waline-container :global(.wl-editor) {
+    min-height: 10rem;
+    padding: 0.85rem 0.9rem;
     border-radius: var(--radius-md);
+    background: var(--paper-deep);
+    color: var(--ink);
+    line-height: 1.85;
+  }
+  #waline-container :global(.wl-editor:focus) {
+    background: var(--surface);
+    box-shadow: 0 0 0 3px var(--ember-soft);
+  }
+  #waline-container :global(.wl-editor:empty::before) {
+    color: var(--faint);
+  }
+  #waline-container :global(.wl-preview .wl-content) {
+    padding: 0.75rem;
+    border: 1px dashed var(--line-strong);
+    border-radius: var(--radius-md);
+    background: var(--paper-deep);
+  }
+  #waline-container :global(.wl-footer) {
+    padding: 0.75rem 1rem 1rem;
   }
   #waline-container :global(.wl-btn) {
     border-radius: var(--radius-full);
+    font-family: var(--font-sans);
+    font-weight: 600;
+    transition: color var(--t-fast), background var(--t-fast), border-color var(--t-fast),
+      transform var(--t-fast) var(--ease-out);
+  }
+  #waline-container :global(.wl-btn:hover) {
+    transform: translateY(-1px);
+  }
+  #waline-container :global(.wl-btn.primary) {
+    border-color: var(--ink);
+    background: var(--ink);
+    color: var(--paper);
+  }
+  #waline-container :global(.wl-btn.primary:hover),
+  #waline-container :global(.wl-btn.primary:active) {
+    border-color: var(--ember);
+    background: var(--ember);
+    color: #fff;
+  }
+  #waline-container :global(.wl-action) {
+    border-radius: var(--radius-sm);
+    transition: color var(--t-fast), background var(--t-fast), transform var(--t-fast) var(--ease-spring);
+  }
+  #waline-container :global(.wl-actions .wl-action) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  #waline-container :global(.wl-action svg) {
+    display: block;
+  }
+  #waline-container :global(.wl-action:hover) {
+    background: var(--ember-soft);
+    transform: translateY(-1px);
+  }
+  #waline-container :global(.wl-info .wl-text-number) {
+    color: var(--faint);
+    font-family: var(--font-mono);
+  }
+  #waline-container :global(.wl-emoji-popup),
+  #waline-container :global(.wl-gif-popup) {
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
+  }
+  #waline-container :global(.wl-emoji-popup .wl-tab.active) {
+    border-color: var(--line);
+    background: var(--paper-deep);
+    color: var(--ember);
+  }
+  #waline-container :global(.wl-gif-popup input) {
+    border-radius: var(--radius-sm);
+    background: var(--paper-deep);
+    color: var(--ink);
+  }
+
+  #waline-container :global(.wl-meta-head) {
+    padding: 0.5rem 0.25rem;
+  }
+  #waline-container :global(.wl-count) {
+    color: var(--ink);
+    font-family: var(--font-serif);
+    font-size: 1.35rem;
+  }
+  #waline-container :global(.wl-sort li) {
+    color: var(--muted);
+    font-size: 0.76rem;
+  }
+  #waline-container :global(.wl-sort li.active) {
+    color: var(--ember);
+    font-weight: 650;
+  }
+  #waline-container :global(.wl-card-item) {
+    padding: 0.65rem;
+  }
+  #waline-container :global(.wl-card) {
+    margin-inline-start: 0;
+    padding: 1rem 1.1rem;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-md);
+    background: var(--surface);
+    transition: border-color var(--t-base), box-shadow var(--t-base);
+  }
+  #waline-container :global(.wl-card:hover) {
+    border-color: color-mix(in srgb, var(--ember) 28%, var(--line));
+    box-shadow: var(--shadow-xs);
+  }
+  #waline-container :global(.wl-card .wl-head .wl-nick) {
+    color: var(--ink);
+    font-family: var(--font-serif);
+    font-size: 1rem;
+    font-weight: 600;
+  }
+  #waline-container :global(.wl-card .wl-time) {
+    color: var(--faint);
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+  }
+  #waline-container :global(.wl-card .wl-meta > span) {
+    border-radius: var(--radius-full);
+    background: var(--paper-deep);
+    color: var(--faint);
+  }
+  #waline-container :global(.wl-card .wl-badge) {
+    border-color: var(--indigo);
+    border-radius: var(--radius-full);
+    color: var(--indigo);
+  }
+  #waline-container :global(.wl-card .wl-content) {
+    color: var(--ink-soft);
+    font-size: 0.9rem;
+  }
+  #waline-container :global(.wl-card .wl-content p) {
+    color: var(--ink-soft);
+  }
+  #waline-container :global(.wl-card .wl-content a) {
+    color: var(--ember);
+    text-decoration: underline;
+    text-decoration-color: color-mix(in srgb, var(--ember) 45%, transparent);
+    text-underline-offset: 3px;
+  }
+  #waline-container :global(.wl-card .wl-content blockquote) {
+    border-inline-start: 2px solid var(--ember);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    background: var(--ember-soft);
+    color: var(--ink-soft);
+  }
+  #waline-container :global(.wl-card .wl-quote) {
+    border-inline-start: 2px solid var(--ember);
+  }
+  #waline-container :global(.wl-card .wl-comment-actions button) {
+    border-radius: var(--radius-xs);
+    transition: color var(--t-fast), background var(--t-fast);
+  }
+  #waline-container :global(.wl-card .wl-comment-actions button:hover) {
+    background: var(--ember-soft);
+  }
+  #waline-container :global(.wl-card .wl-content.expand::before) {
+    background: linear-gradient(180deg, transparent, var(--surface));
+  }
+  #waline-container :global(.wl-card .wl-content.expand::after) {
+    background: var(--surface);
+    color: var(--muted);
+  }
+  #waline-container :global(.wl-card .wl-user-avatar),
+  #waline-container :global(.wl-avatar img) {
+    border-radius: 50%;
+  }
+  #waline-container :global(.wl-empty) {
+    border: 1px dashed var(--line-strong);
+    border-radius: var(--radius-md);
+    background: var(--paper-deep);
+    color: var(--muted);
+  }
+  #waline-container :global(.wl-power) {
+    color: var(--faint);
+  }
+  #waline-container :global(.wl-reaction-votes) {
+    border-color: var(--ember);
+    color: var(--ember);
+  }
+  #waline-container :global(.wl-reaction-item.active .wl-reaction-votes) {
+    background: var(--ember);
+    color: var(--surface);
+  }
+
+  @media (max-width: 580px) {
+    #waline-container :global(.wl-header) {
+      background: var(--paper-deep);
+    }
+    #waline-container :global(.wl-card) {
+      padding: 0.85rem;
+    }
+    #waline-container :global(.wl-editor) {
+      min-height: 9rem;
+    }
   }
 </style>

@@ -3,10 +3,11 @@ import BaseLayout from './BaseLayout.astro';
 import Icon from '../components/Icon.astro';
 import TableOfContents from '../components/TableOfContents.astro';
 import ShareBar from '../components/ShareBar.astro';
+import ReactionBar from '../components/ReactionBar.astro';
 import Comments from '../components/Comments.astro';
 import type { CollectionEntry } from 'astro:content';
 import { siteConfig } from '../data/site.config';
-import { formatDate, readingTime, tagUrl } from '../utils/format';
+import { entrySlug, formatDate, readingTime } from '../utils/format';
 
 interface Heading {
   depth: number;
@@ -20,7 +21,7 @@ interface Props {
 const { post, headings } = Astro.props;
 const { title, description, pubDate, updatedDate, cover, coverAlt, tags, category } = post.data;
 const minutes = readingTime(post.body);
-const canonical = new URL(`/writing/${post.id}`, siteConfig.url).href;
+const canonical = new URL(`/writing/${entrySlug(post)}`, siteConfig.url).href;
 ---
 
 <BaseLayout
@@ -31,10 +32,10 @@ const canonical = new URL(`/writing/${post.id}`, siteConfig.url).href;
   publishedTime={pubDate.toISOString()}
   tags={tags}
 >
-  <article class="article">
+  <article class="article" data-pagefind-body>
     <header class="post-hero">
       <div class="hero-media" data-hero-media aria-hidden="true">
-        <img src={cover} alt={coverAlt ?? ''} />
+        <img src={cover} alt={coverAlt ?? ''} loading="eager" fetchpriority="high" decoding="async" />
         <div class="hero-veil"></div>
       </div>
       <div class="container hero-inner">
@@ -78,21 +79,16 @@ const canonical = new URL(`/writing/${post.id}`, siteConfig.url).href;
             <Icon name="quote" size={20} />
             <p>如果这篇文章让你停下来想了一会儿，那它就完成了使命。</p>
           </div>
-          <div class="rail-line"></div>
-          <span class="rail-label">SHARE</span>
-          <ShareBar title={title} url={canonical} />
         </div>
       </aside>
     </div>
 
     <div class="container post-end">
-      <div class="tags-row">
-        <span class="tags-label"><Icon name="hash" size={14} />标签</span>
-        {tags.map((tag) => <a class="tag" href={tagUrl(tag)}>#{tag}</a>)}
-      </div>
       <div class="end-share">
         <ShareBar title={title} url={canonical} />
       </div>
+
+      <ReactionBar />
 
       <div class="author-card" data-reveal data-spotlight>
         <img src={siteConfig.author.avatar} alt={siteConfig.author.name} width="88" height="88" />
@@ -106,6 +102,10 @@ const canonical = new URL(`/writing/${post.id}`, siteConfig.url).href;
           </div>
         </div>
       </div>
+    </div>
+
+    <div class="container post-navigation-wrap">
+      <slot name="navigation" />
     </div>
 
     <div class="container related-wrap">
@@ -132,15 +132,21 @@ const canonical = new URL(`/writing/${post.id}`, siteConfig.url).href;
     width: 100%;
     height: 120%;
     object-fit: cover;
-    opacity: 0.5;
-    filter: saturate(0.85);
+    opacity: 0.72;
+    filter: saturate(0.95);
     translate: 0 var(--hero-parallax, 0px);
     will-change: translate;
   }
   .hero-veil {
     position: absolute;
     inset: 0;
-    background: linear-gradient(180deg, var(--paper) 0%, color-mix(in srgb, var(--paper) 82%, transparent) 42%, var(--paper) 98%);
+    background:
+      linear-gradient(90deg, color-mix(in srgb, var(--paper) 90%, transparent) 0%, color-mix(in srgb, var(--paper) 68%, transparent) 43%, transparent 100%),
+      linear-gradient(180deg, color-mix(in srgb, var(--paper) 24%, transparent) 0%, transparent 40%, color-mix(in srgb, var(--paper) 12%, transparent) 78%, var(--paper) 100%);
+  }
+  :global([data-theme='dark']) .hero-media img {
+    opacity: 0.58;
+    filter: saturate(0.86) brightness(0.82);
   }
   .hero-inner {
     position: relative;
@@ -303,29 +309,8 @@ const canonical = new URL(`/writing/${post.id}`, siteConfig.url).href;
     font-style: italic;
     line-height: 1.75;
   }
-  .rail-line {
-    height: 1px;
-    margin: 2rem 0;
-    background: var(--line);
-  }
-
   .post-end {
     padding-top: 1rem;
-  }
-  .tags-row {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-  }
-  .tags-label {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.35rem;
-    margin-right: 0.5rem;
-    color: var(--muted);
-    font-size: 0.78rem;
-    font-weight: 600;
   }
   .end-share {
     margin-top: 2rem;
@@ -403,6 +388,14 @@ const canonical = new URL(`/writing/${post.id}`, siteConfig.url).href;
       grid-template-columns: 1fr;
     }
     .left-rail {
+      position: static;
+      display: block;
+      padding: 0;
+      background: transparent;
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+    }
+    .left-rail .back-link {
       display: none;
     }
   }

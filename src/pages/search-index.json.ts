@@ -1,6 +1,7 @@
 import type { APIRoute } from 'astro';
 import { getCollection } from 'astro:content';
 import { plainText } from '../utils/format';
+import { entrySlug } from '../utils/format';
 
 /** Generated at build time. Kept tiny so ⌘K search stays instant and dependency-free. */
 export const GET: APIRoute = async () => {
@@ -11,7 +12,7 @@ export const GET: APIRoute = async () => {
     ...posts.map((post) => ({
       title: post.data.title,
       description: post.data.description,
-      url: `/writing/${post.id}`,
+      url: `/writing/${entrySlug(post)}`,
       type: '文章',
       tags: post.data.tags,
       date: post.data.pubDate.toISOString().slice(0, 10),
@@ -20,7 +21,7 @@ export const GET: APIRoute = async () => {
     ...notes.map((note) => ({
       title: note.data.title,
       description: note.data.description ?? '',
-      url: `/notes/${note.id}`,
+      url: `/notes/${entrySlug(note)}`,
       type: '笔记',
       tags: note.data.tags,
       date: note.data.pubDate.toISOString().slice(0, 10),

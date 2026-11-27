@@ -14,23 +14,37 @@ const items = headings.filter((h) => h.depth === 2 || h.depth === 3);
 ---
 
 {items.length > 0 && (
-  <aside class="toc" data-toc aria-label="文章目录">
-    <div class="toc-header"><Icon name="compass" size={15} /><span>目录</span><small data-toc-percent>0%</small></div>
-    <nav class="toc-list">
-      {items.map((h) => (
-        <a
-          href={`#${h.slug}`}
-          class:list={['toc-item', { 'toc-sub': h.depth === 3 }]}
-          data-toc-link={h.slug}
-        >
-          <span class="toc-dot"></span>
-          <span class="toc-text">{h.text}</span>
-        </a>
-      ))}
-    </nav>
-    <div class="toc-track"><span data-toc-progress></span></div>
-    <div class="toc-foot">CHAPTERS · {items.length}</div>
-  </aside>
+  <>
+    <aside class="toc toc-desktop" data-toc aria-label="文章目录">
+      <div class="toc-header"><Icon name="compass" size={15} /><span>目录</span><small data-toc-percent>0%</small></div>
+      <nav class="toc-list">
+        {items.map((h) => (
+          <a href={`#${h.slug}`} class:list={['toc-item', { 'toc-sub': h.depth === 3 }]} data-toc-link={h.slug}>
+            <span class="toc-dot"></span>
+            <span class="toc-text">{h.text}</span>
+          </a>
+        ))}
+      </nav>
+      <div class="toc-track"><span data-toc-progress></span></div>
+      <div class="toc-foot">CHAPTERS · {items.length}</div>
+    </aside>
+
+    <details class="toc-mobile">
+      <summary>
+        <span><Icon name="compass" size={15} /> 文章目录</span>
+        <span class="toc-mobile-meta"><small data-toc-percent>0%</small><Icon name="arrow-down" size={15} /></span>
+      </summary>
+      <nav class="toc-mobile-list" aria-label="文章目录">
+        {items.map((h) => (
+          <a href={`#${h.slug}`} class:list={['toc-item', { 'toc-sub': h.depth === 3 }]} data-toc-link={h.slug}>
+            <span class="toc-dot"></span>
+            <span class="toc-text">{h.text}</span>
+          </a>
+        ))}
+      </nav>
+      <div class="toc-track"><span data-toc-progress></span></div>
+    </details>
+  </>
 )}
 
 <style>
@@ -128,5 +142,74 @@ const items = headings.filter((h) => h.depth === 2 || h.depth === 3);
     font-size: 0.6rem;
     letter-spacing: 0.14em;
     color: var(--faint);
+  }
+
+  .toc-mobile {
+    display: none;
+    margin-bottom: 1.5rem;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-md);
+    background: var(--surface);
+    overflow: hidden;
+  }
+  .toc-mobile summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.9rem 1rem;
+    cursor: pointer;
+    list-style: none;
+    color: var(--ink-soft);
+    font-size: 0.82rem;
+    font-weight: 600;
+  }
+  .toc-mobile summary::-webkit-details-marker {
+    display: none;
+  }
+  .toc-mobile summary > span,
+  .toc-mobile-meta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+  }
+  .toc-mobile summary svg {
+    color: var(--ember);
+  }
+  .toc-mobile-meta small {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    font-weight: 500;
+    color: var(--faint);
+  }
+  .toc-mobile-meta svg {
+    transition: transform var(--t-base) var(--ease-out);
+  }
+  .toc-mobile[open] .toc-mobile-meta svg {
+    transform: rotate(180deg);
+  }
+  .toc-mobile-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    max-height: 46vh;
+    overflow-y: auto;
+    padding: 0 1rem 0.8rem;
+    border-top: 1px solid var(--line);
+  }
+  .toc-mobile-list .toc-item:first-child {
+    margin-top: 0.6rem;
+  }
+  .toc-mobile .toc-track {
+    margin: 0 1rem 0.9rem;
+  }
+
+  @media (max-width: 860px) {
+    .toc-desktop {
+      display: none;
+    }
+    .toc-mobile {
+      display: block;
+    }
   }
 </style>

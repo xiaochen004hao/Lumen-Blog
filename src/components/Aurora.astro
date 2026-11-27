@@ -1,5 +1,5 @@
 ---
-/** Pure-CSS ambient background: three drifting gradient orbs + hairline grid. */
+/** Pure-CSS ambient background: three drifting gradient orbs. */
 interface Props {
   class?: string;
 }
@@ -7,7 +7,6 @@ const { class: className = '' } = Astro.props;
 ---
 
 <div class:list={['aurora', className]} aria-hidden="true">
-  <div class="grid"></div>
   <div class="orb orb-one"></div>
   <div class="orb orb-two"></div>
   <div class="orb orb-three"></div>
@@ -22,16 +21,6 @@ const { class: className = '' } = Astro.props;
     overflow: hidden;
     pointer-events: none;
     border-radius: inherit;
-  }
-
-  .grid {
-    position: absolute;
-    inset: -1px;
-    background-image: linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
-      linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
-    background-size: 64px 64px;
-    mask-image: radial-gradient(ellipse 75% 65% at 50% 40%, #000 20%, transparent 100%);
-    -webkit-mask-image: radial-gradient(ellipse 75% 65% at 50% 40%, #000 20%, transparent 100%);
   }
 
   .orb {

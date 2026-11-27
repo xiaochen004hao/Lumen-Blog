@@ -24,7 +24,7 @@ export const siteConfig = {
     bio: '嗨，我是 xiaochen004hao，一个正在学习一切新鲜事物的小萌新。这里是我记录学习笔记、分享有趣东西的地方——我会把这个花园一点点打造成真正美观、有用的地方。',
     avatar: '/avatar.png',
     location: 'Earth',
-    email: 'xiaochen004hao@users.noreply.github.com',
+    email: 'xiaochen004hao@163.com',
     status: '花园建设中',
   },
 
@@ -44,6 +44,7 @@ export const siteConfig = {
     { label: '文章', href: '/writing' },
     { label: '笔记', href: '/notes' },
     { label: '标签', href: '/tags' },
+    { label: '归档', href: '/archive' },
     { label: '关于', href: '/about' },
   ],
 

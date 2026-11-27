@@ -1,6 +1,6 @@
 # 留白 · Lumen
 
-一个用 **Astro 7** 打造的高级静态数字花园 / 博客。零前端框架、SVG 原生封面、系统字体栈，兼顾极速加载与细腻交互。
+一个用 **Astro 7** 打造的高级静态数字花园 / 博客。零前端框架、SVG 原生封面、自托管可变字体，兼顾极速加载与细腻交互。
 
 ---
 
@@ -9,11 +9,12 @@
 **访客体验**
 - 极光渐变 Hero + 细颗粒质感 + 逐行入场动画
 - 深浅主题切换（带圆形扩散动画，记忆偏好，防止首屏闪白）
-- 全站搜索 `⌘/Ctrl + K`，支持标题 / 标签 / 正文加权匹配与方向键操作
+- 全站搜索 `⌘/Ctrl + K` 或 `/`，Pagefind 全文索引，支持标题 / 标签 / 正文匹配与方向键操作
 - 文章列表：标签筛选、网格 / 列表视图切换
-- 文章页：阅读进度条、滚动高亮目录、代码块一键复制、分享、作者卡片、相关阅读
+- 文章页：阅读进度条、滚动高亮目录、移动端折叠目录、代码块一键复制、分享、本地点赞、前后篇导航、作者卡片、相关阅读
 - 笔记页：心情筛选与独立详情页
-- 标签云、关于页、创意 404、RSS、Sitemap、robots.txt
+- 标签云、时间归档、关于页、创意 404、RSS、Sitemap、robots.txt
+- Service Worker 离线壳、已访问页面缓存与断网回退（生产环境自动启用，自动检查更新并提示刷新）
 - 主题切换使用 View Transition 双层圆形揭幕（从按钮位置扩散，无橙色遮罩），客户端换页后自动恢复已选主题
 - 页面标题跨页形变过渡、卡片鼠标跟随光晕、按钮磁吸微动、精选卡片旋转渐变描边、Hero / 封面视差
 - 文章标题支持悬停显示锚点链接；返回顶部按钮带环形滚动进度
@@ -27,9 +28,9 @@
 - 组件化结构，页面与内容完全解耦
 
 **性能**
-- 构建产物约 1.2 MB（含全部 SVG 与 32 个页面）
-- 站点交互脚本 gzip 后约 **3.8 KB**，路由脚本约 5.3 KB
-- 无 Web 字体请求、无图片请求（封面均为内联友好的 SVG）
+- 构建产物约 2.8 MB（含全部 SVG、自托管字体、Pagefind 索引与 34 个页面）
+- 字体仅加载实际使用的 Latin 子集，中文使用系统字体回退
+- 无第三方图片请求（封面均为内联友好的 SVG）
 - 静态输出，可部署到任何静态托管平台
 
 ---
@@ -39,11 +40,13 @@
 ```bash
 npm install       # 安装依赖
 npm run dev       # 本地开发，默认 http://localhost:4321
-npm run build     # 生成 dist/ 静态站点
+npm run check     # Astro / TypeScript 类型检查
+npm run build     # 类型检查 + 生成 dist/ + Pagefind 索引 + Service Worker 版本
 npm run preview   # 预览构建产物
 ```
 
 > 本项目使用 Astro 7，需要 **Node.js ≥ 22.23.4**（本机 `D:/nodejs` 为 v24.11.1，已验证构建通过）。
+> Service Worker 仅在 HTTPS 或 localhost 生效，开发模式不会注册。
 > 注意：WorkBuddy 内置终端的默认 Node 是 v22.22.2，若在内置终端运行命令，请先执行
 > `export PATH="/d/nodejs:$PATH"`；使用系统终端且已指向 Node 24 时无需此步。
 
@@ -54,6 +57,7 @@ npm run preview   # 预览构建产物
 ```
 Lumen-Blog/
 ├── astro.config.mjs          # Astro 配置（ integrations / SEO / 构建 ）
+├── scripts/version-sw.mjs    # 按构建内容自动生成 Service Worker 缓存版本
 ├── src/
 │   ├── content.config.ts     # 内容集合 schema（文章 / 笔记的字段定义）
 │   ├── data/site.config.ts   # ⭐ 站点唯一配置文件
@@ -61,7 +65,7 @@ Lumen-Blog/
 │   ├── components/           # 可复用组件（Header / 卡片 / 搜索 / 动画…）
 │   │   └── mdx/              # MDX 专用组件
 │   ├── layouts/              # BaseLayout / PostLayout
-│   ├── pages/                # 所有页面与 RSS / 搜索索引 / robots
+│   ├── pages/                # 所有页面与 RSS / 搜索索引 / robots / 归档
 │   ├── content/
 │   │   ├── blog/             # ⭐ 文章放这里（.md / .mdx）
 │   │   └── notes/            # ⭐ 笔记放这里（.md / .mdx）
@@ -70,7 +74,8 @@ Lumen-Blog/
     ├── covers/               # 文章封面 SVG（可直接替换）
     ├── favicon.svg
     ├── avatar.svg            # 作者头像
-    └── og-default.svg        # 默认社交分享图
+    ├── og-default.svg        # 默认社交分享图
+    └── sw.js                 # Service Worker 缓存与离线回退
 ```
 
 ---
@@ -158,9 +163,11 @@ draft: false
 
 ## 🧩 交互脚本说明
 
-全站只有一个约 3.8 KB（gzip）的交互脚本，位于 `src/layouts/BaseLayout.astro` 底部。它负责：
-主题切换与记忆、搜索弹层、滚动揭示、统计数字滚动、阅读进度与目录高亮、
-代码复制、列表筛选 / 视图切换、分享链接复制、背景网格辉光追踪、移动端菜单、订阅表单演示。
+全站交互脚本位于 `src/layouts/BaseLayout.astro` 底部。它负责：
+主题切换与记忆、Pagefind 搜索、滚动揭示、统计数字滚动、阅读进度与目录高亮、
+代码复制、文章点赞、列表筛选 / 视图切换、分享链接复制、背景网格辉光追踪、移动端菜单、订阅表单演示。
+
+生产构建会自动运行 Pagefind，只为文章与笔记生成全文索引；开发环境自动回退到轻量 JSON 搜索。
 
 脚本监听 Astro 的 `astro:page-load` 事件，因此在客户端路由切换页面后依然正常工作。
 

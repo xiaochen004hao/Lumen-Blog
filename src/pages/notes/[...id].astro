@@ -5,18 +5,18 @@ import Icon from '../../components/Icon.astro';
 import ShareBar from '../../components/ShareBar.astro';
 import Comments from '../../components/Comments.astro';
 import { mdxComponents } from '../../utils/mdx-components';
-import { formatDate, tagUrl } from '../../utils/format';
+import { entrySlug, formatDate } from '../../utils/format';
 import { siteConfig } from '../../data/site.config';
 
 export async function getStaticPaths() {
   const notes = await getCollection('notes', ({ data }) => !data.draft);
-  return notes.map((note) => ({ params: { id: note.id }, props: { note } }));
+  return notes.map((note) => ({ params: { id: entrySlug(note) }, props: { note } }));
 }
 
 const { note } = Astro.props;
 const { Content } = await render(note);
 const { title, pubDate, tags, mood, accent } = note.data;
-const canonical = new URL(`/notes/${note.id}`, siteConfig.url).href;
+const canonical = new URL(`/notes/${entrySlug(note)}`, siteConfig.url).href;
 ---
 
 <BaseLayout
@@ -24,7 +24,7 @@ const canonical = new URL(`/notes/${note.id}`, siteConfig.url).href;
   description={note.data.description ?? `${title} — 来自 ${siteConfig.title} 的灵感碎片。`}
   tags={tags}
 >
-  <article class="note-detail" data-accent={accent}>
+  <article class="note-detail" data-accent={accent} data-pagefind-body>
     <div class="container note-container">
       <a class="back-link" href="/notes"><Icon name="arrow-left" size={14} /> 返回所有笔记</a>
 
@@ -44,9 +44,6 @@ const canonical = new URL(`/notes/${note.id}`, siteConfig.url).href;
       </div>
 
       <div class="note-tail">
-        <div class="tags-row">
-          {tags.map((tag) => <a class="tag" href={tagUrl(tag)}>#{tag}</a>)}
-        </div>
         <ShareBar title={title} url={canonical} />
       </div>
 
@@ -127,14 +124,8 @@ const canonical = new URL(`/notes/${note.id}`, siteConfig.url).href;
   }
   .note-content { font-size: 1.05rem; }
   .note-tail {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 1.5rem;
     margin-top: 3.5rem;
     padding-top: 1.8rem;
     border-top: 1px solid var(--line);
   }
-  .tags-row { display: flex; flex-wrap: wrap; gap: 0.5rem; }
 </style>

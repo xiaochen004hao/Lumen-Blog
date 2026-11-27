@@ -9,6 +9,7 @@ import NoteCard from '../components/NoteCard.astro';
 import Stats from '../components/Stats.astro';
 import Subscribe from '../components/Subscribe.astro';
 import { siteConfig } from '../data/site.config';
+import { entrySlug } from '../utils/format';
 
 const allPosts = (await getCollection('blog', ({ data }) => !data.draft)).sort(
   (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
@@ -77,7 +78,7 @@ const marqueeWords = ['DESIGN', 'CODE', 'WRITING', 'SLOW THINKING', 'ASTRO', 'IN
             <span class="visual-kicker">LATEST ESSAY · {featured?.data.category}</span>
             <h2>{featured?.data.title}</h2>
             <p>{featured?.data.description}</p>
-            <a href={`/writing/${featured?.id}`} aria-label={`阅读 ${featured?.data.title}`}>
+            <a href={`/writing/${featured ? entrySlug(featured) : ''}`} aria-label={`阅读 ${featured?.data.title}`}>
               阅读全文 <Icon name="arrow-right" size={15} />
             </a>
           </div>

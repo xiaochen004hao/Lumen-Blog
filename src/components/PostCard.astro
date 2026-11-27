@@ -1,7 +1,7 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 import Icon from './Icon.astro';
-import { formatDate, readingTime } from '../utils/format';
+import { entrySlug, formatDate, readingTime } from '../utils/format';
 
 interface Props {
   post: CollectionEntry<'blog'>;
@@ -10,7 +10,7 @@ interface Props {
 }
 const { post, variant = 'default', index = 0 } = Astro.props;
 const { title, description, pubDate, cover, coverAlt, tags, category, accent } = post.data;
-const href = `/writing/${post.id}`;
+const href = `/writing/${entrySlug(post)}`;
 const minutes = readingTime(post.body);
 ---
 

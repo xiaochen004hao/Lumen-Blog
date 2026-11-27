@@ -1,0 +1,67 @@
+<div class="sw-update" data-sw-update role="status" aria-live="polite" hidden transition:persist="sw-update">
+  <span class="sw-update-dot" aria-hidden="true"></span>
+  <span>网站已更新</span>
+  <button type="button" data-sw-refresh>刷新查看</button>
+</div>
+
+<style>
+  .sw-update {
+    position: fixed;
+    left: clamp(1rem, 3vw, 2.5rem);
+    bottom: clamp(1rem, 3vw, 2.5rem);
+    z-index: 1800;
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    padding: 0.7rem 0.8rem 0.7rem 1rem;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-full);
+    background: color-mix(in srgb, var(--surface) 92%, transparent);
+    box-shadow: var(--shadow-md);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    color: var(--ink-soft);
+    font-size: 0.78rem;
+    animation: sw-update-in 420ms var(--ease-spring) both;
+  }
+  .sw-update[hidden] {
+    display: none;
+  }
+  .sw-update-dot {
+    width: 0.45rem;
+    height: 0.45rem;
+    border-radius: 50%;
+    background: var(--ember);
+    box-shadow: 0 0 0 4px var(--ember-soft);
+  }
+  .sw-update button {
+    padding: 0.35rem 0.75rem;
+    border: 0;
+    border-radius: var(--radius-full);
+    background: var(--ink);
+    color: var(--paper);
+    font-size: 0.72rem;
+    font-weight: 650;
+    transition: background-color var(--t-fast), transform var(--t-fast) var(--ease-out);
+  }
+  .sw-update button:hover {
+    background: var(--ember);
+    transform: translateY(-1px);
+  }
+  .sw-update button:active {
+    transform: translateY(0) scale(0.97);
+  }
+  @keyframes sw-update-in {
+    from {
+      opacity: 0;
+      transform: translateY(12px) scale(0.96);
+    }
+  }
+  @media (max-width: 520px) {
+    .sw-update {
+      right: 1rem;
+      left: 1rem;
+      justify-content: center;
+    }
+  }
+</style>

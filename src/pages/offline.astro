@@ -1,0 +1,65 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Icon from '../components/Icon.astro';
+import Aurora from '../components/Aurora.astro';
+---
+
+<BaseLayout title="当前离线" description="网络暂时不可用，已为你打开离线页面。">
+  <section class="offline" data-pagefind-ignore>
+    <Aurora />
+    <div class="container offline-inner">
+      <span class="eyebrow">OFFLINE, BUT STILL HERE</span>
+      <h1 transition:name="page-heading">暂时离线，花园还在。</h1>
+      <p>当前网络不可用。你之前访问过的页面仍可从本地缓存打开，重新连接后就能继续阅读。</p>
+      <div class="offline-actions">
+        <a class="btn btn-primary" href="/"><Icon name="arrow-left" size={16} /> 回到首页</a>
+        <button class="btn btn-outline" type="button" data-offline-retry>重新连接 <Icon name="arrow-right" size={15} /></button>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    document.querySelector<HTMLButtonElement>('[data-offline-retry]')?.addEventListener('click', () => location.reload());
+  </script>
+</BaseLayout>
+
+<style>
+  .offline {
+    position: relative;
+    display: grid;
+    place-items: center;
+    min-height: calc(100vh - var(--header-h) - 220px);
+    overflow: hidden;
+    padding-block: 5rem;
+    text-align: center;
+  }
+  .offline-inner {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 42rem;
+  }
+  .offline h1 {
+    margin-top: 1.2rem;
+    font-family: var(--font-serif);
+    font-size: clamp(2.2rem, 7vw, 4.5rem);
+    letter-spacing: -0.04em;
+    line-height: 1.05;
+  }
+  .offline p {
+    max-width: 32rem;
+    margin-top: 1.2rem;
+    color: var(--muted);
+    font-size: 0.95rem;
+    line-height: 1.9;
+  }
+  .offline-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.8rem;
+    margin-top: 2.2rem;
+  }
+</style>

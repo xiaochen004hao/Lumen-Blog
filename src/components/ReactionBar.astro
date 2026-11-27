@@ -1,0 +1,99 @@
+---
+import Icon from './Icon.astro';
+---
+
+<div class="reaction-wrap" data-reveal>
+  <button class="reaction-button" type="button" data-reaction aria-pressed="false">
+    <span class="reaction-icon"><Icon name="heart" size={18} /></span>
+    <span class="reaction-copy"><strong>这篇文字有帮助吗？</strong><small>点一下，给我一点继续写的动力</small></span>
+    <span class="reaction-count" data-reaction-count>成为第一个</span>
+  </button>
+</div>
+
+<style>
+  .reaction-wrap {
+    margin-top: 2rem;
+  }
+  .reaction-button {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    width: 100%;
+    padding: 1rem 1.15rem;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-md);
+    background: linear-gradient(110deg, var(--surface), var(--paper-deep));
+    text-align: left;
+    transition: border-color var(--t-base), box-shadow var(--t-base), transform var(--t-base) var(--ease-spring);
+  }
+  .reaction-button:hover {
+    transform: translateY(-2px);
+    border-color: color-mix(in srgb, var(--ember) 38%, transparent);
+    box-shadow: var(--shadow-sm);
+  }
+  .reaction-icon {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    background: var(--ember-soft);
+    color: var(--ember);
+    transition: transform var(--t-base) var(--ease-bounce), background var(--t-base), color var(--t-base);
+  }
+  .reaction-copy {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+  .reaction-copy strong {
+    font-size: 0.88rem;
+    font-weight: 650;
+  }
+  .reaction-copy small {
+    margin-top: 0.12rem;
+    color: var(--muted);
+    font-size: 0.74rem;
+  }
+  .reaction-count {
+    flex: none;
+    margin-left: auto;
+    padding: 0.3rem 0.7rem;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-full);
+    color: var(--muted);
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+  }
+  .reaction-button.is-active {
+    border-color: color-mix(in srgb, var(--rose) 45%, transparent);
+  }
+  .reaction-button.is-active .reaction-icon {
+    background: color-mix(in srgb, var(--rose) 14%, transparent);
+    color: var(--rose);
+    transform: scale(1.08);
+    animation: heart-pop 520ms var(--ease-bounce);
+  }
+  .reaction-button.is-active .reaction-icon :global(svg) {
+    fill: currentColor;
+  }
+  .reaction-button.is-active .reaction-count {
+    border-color: transparent;
+    background: color-mix(in srgb, var(--rose) 12%, transparent);
+    color: var(--rose);
+  }
+  @keyframes heart-pop {
+    0% { transform: scale(1); }
+    45% { transform: scale(1.28) rotate(-8deg); }
+    100% { transform: scale(1.08); }
+  }
+  @media (max-width: 520px) {
+    .reaction-button {
+      flex-wrap: wrap;
+    }
+    .reaction-count {
+      margin-left: 3.4rem;
+    }
+  }
+</style>

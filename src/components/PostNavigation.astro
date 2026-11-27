@@ -1,0 +1,96 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import Icon from './Icon.astro';
+import { entrySlug, formatDate } from '../utils/format';
+
+interface Props {
+  previous?: CollectionEntry<'blog'>;
+  next?: CollectionEntry<'blog'>;
+}
+const { previous, next } = Astro.props;
+---
+
+{(previous || next) && (
+  <nav class="post-nav" aria-label="相邻文章" data-reveal>
+    {previous ? (
+      <a class="post-nav-link previous" href={`/writing/${entrySlug(previous)}`}>
+        <span class="nav-direction"><Icon name="arrow-left" size={14} /> 上一篇 · 更新</span>
+        <strong>{previous.data.title}</strong>
+        <small>{formatDate(previous.data.pubDate, 'short')}</small>
+      </a>
+    ) : <span></span>}
+    {next ? (
+      <a class="post-nav-link next" href={`/writing/${entrySlug(next)}`}>
+        <span class="nav-direction">下一篇 · 更早 <Icon name="arrow-right" size={14} /></span>
+        <strong>{next.data.title}</strong>
+        <small>{formatDate(next.data.pubDate, 'short')}</small>
+      </a>
+    ) : <span></span>}
+  </nav>
+)}
+
+<style>
+  .post-nav {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-top: 3.5rem;
+  }
+  .post-nav-link {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    padding: 1.25rem 1.35rem;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-md);
+    background: var(--surface);
+    transition: transform var(--t-base) var(--ease-out), border-color var(--t-base), box-shadow var(--t-base);
+  }
+  .post-nav-link:hover {
+    transform: translateY(-3px);
+    border-color: color-mix(in srgb, var(--ember) 38%, transparent);
+    box-shadow: var(--shadow-sm);
+  }
+  .post-nav-link.next {
+    text-align: right;
+  }
+  .nav-direction {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    color: var(--ember);
+    font-size: 0.7rem;
+    font-weight: 650;
+    letter-spacing: 0.04em;
+  }
+  .post-nav-link.next .nav-direction {
+    justify-content: flex-end;
+  }
+  .post-nav-link strong {
+    margin-top: 0.65rem;
+    overflow: hidden;
+    font-family: var(--font-serif);
+    font-size: 1.08rem;
+    font-weight: 600;
+    line-height: 1.45;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .post-nav-link small {
+    margin-top: 0.35rem;
+    color: var(--faint);
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+  }
+  @media (max-width: 620px) {
+    .post-nav {
+      grid-template-columns: 1fr;
+    }
+    .post-nav-link.next {
+      text-align: left;
+    }
+    .post-nav-link.next .nav-direction {
+      justify-content: flex-start;
+    }
+  }
+</style>

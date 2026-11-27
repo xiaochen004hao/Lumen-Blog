@@ -1,5 +1,9 @@
 /** Shared formatting helpers used by cards, pages and feeds. */
 
+export function entrySlug(entry: { id: string }): string {
+  return entry.id.replace(/\.(md|mdx)$/i, '');
+}
+
 export function formatDate(date: Date, style: 'long' | 'short' | 'iso' = 'long'): string {
   if (style === 'iso') return date.toISOString().slice(0, 10);
   if (style === 'short') {
